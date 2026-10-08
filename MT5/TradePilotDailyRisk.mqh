@@ -89,7 +89,9 @@ bool TPDL_AcceptRisk(double planned,string &reason)
 void TPDL_FinalStatus()
 {
  string reason="";
- if(!TPDL_EntryAllowed(reason)) {
+ bool active=TPDL_EntryAllowed(reason);
+ ObjectSetInteger(0,"TradePilot_DAILY_STATUS_VALUE",OBJPROP_COLOR,active?C'90,220,140':C'255,100,100');
+ if(!active) {
   ObjectSetString(0,"TradePilot_DAILY_STATUS_VALUE",OBJPROP_TEXT,TPDL_Limit()>0 ? "DAILY LIMIT PAUSED" : "ENTRY CHECK PENDING");
   ObjectSetString(0,"TradePilot_DAILY_STATUS_VALUE",OBJPROP_TOOLTIP,reason);
   ObjectSetInteger(0,"TradePilot_DAILY_STATUS_VALUE",OBJPROP_COLOR,clrRed);
@@ -138,24 +140,28 @@ void TPDL_Render()
  if(tpdl_ui_period!=period) {tpdl_ui_period=period;tpdl_edit_percent=TPDL_Percent();}
  int y=PanelY();
 #ifdef __MQL5__
- if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(235),S(72));
+ if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(240),S(72));
 #else
- if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(235),S(72),S(19));
+ if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(240),S(72),S(19));
 #endif
- CreateLabel("TradePilot_LIMIT_TITLE","LOSS PROTECTION",LabelX(),y+S(199),FontSize(BASE_FONT_SECTION),C'90,180,255');
- CreateLabel("TradePilot_LIMIT_MODE_LABEL","Limit mode",LabelX(),y+S(218),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateButton("TradePilot_LIMIT_MODE",tpdl_edit_percent?"Percentage":"Cash",ValueX(),y+S(214),S(130),S(19),C'55,60,70');
- CreateLabel("TradePilot_LIMIT_LABEL","Loss limit",LabelX(),y+S(239),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_YDISTANCE,y+S(240));
+ ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_XDISTANCE,ValueX());
+ ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_XSIZE,S(130));
+ CreateLabel("TradePilot_LIMIT_TITLE","DAILY LOSS LIMIT",LabelX(),y+S(199),FontSize(BASE_FONT_SECTION),C'90,180,255');
+ CreateLabel("TradePilot_LIMIT_MODE_LABEL","Limit mode",LabelX(),y+S(220),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateButton("TradePilot_LIMIT_MODE",tpdl_edit_percent?"Percentage":"Cash",ValueX(),y+S(216),S(130),S(19),C'55,60,70');
+ CreateLabel("TradePilot_LIMIT_LABEL","Loss limit",LabelX(),y+S(246),FontSize(BASE_FONT_NORMAL),C'190,195,205');
  ObjectDelete(0,"TradePilot_LIMIT_UPDATE");
  double net=0,remaining=0;bool blocked=false;bool verified=TPDL_State(net,remaining,blocked);
- CreateLabel("TradePilot_LIMIT_REMAIN_LABEL","Budget left",LabelX(),y+S(260),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateLabel("TradePilot_LIMIT_REMAIN_LABEL","Budget left",LabelX(),y+S(270),FontSize(BASE_FONT_NORMAL),C'190,195,205');
  string currency=
 #ifdef __MQL5__
  AccountInfoString(ACCOUNT_CURRENCY);
 #else
  AccountCurrency();
 #endif
- CreateValue("TradePilot_LIMIT_REMAIN",TPDL_Limit()<=0?"No daily limit":!verified?"Not verified":blocked?"Limit reached":"("+currency+" "+DoubleToString(remaining,2)+")",y+S(260),blocked||!verified?clrRed:clrWhite);
+ CreateValue("TradePilot_LIMIT_REMAIN",TPDL_Limit()<=0?"No daily limit":!verified?"Not verified":blocked?"Limit reached":currency+" "+DoubleToString(remaining,2),y+S(270),blocked||!verified?clrRed:clrWhite);
+ TPDR_BudgetEquivalents(GetSessionStartForTime(TPDL_Now()),remaining,verified,TPDL_Limit()>0,currency);
  ObjectSetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TOOLTIP,"Optional daily loss limit. Leave blank for no daily entry limit. Percentage uses the broker-period starting balance; cash uses account currency. Includes all open floating results and net closed results since 23:30.");
  ObjectSetString(0,"TradePilot_LIMIT_MODE",OBJPROP_TOOLTIP,"Choose Percentage or Cash, then press the shared Update button to save. Editing alone does not change the active limit.");
  string reason="";if(!TPDL_EntryAllowed(reason)) {

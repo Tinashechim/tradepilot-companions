@@ -20,8 +20,8 @@ void TPP_Widget(string key,ENUM_OBJECT type,int x,int y,int w,int h,string text,
    ObjectSetInteger(0,name,OBJPROP_TIMEFRAMES,OBJ_ALL_PERIODS);
    ObjectSetInteger(0,name,OBJPROP_CORNER,CORNER_LEFT_UPPER);
    ObjectSetInteger(0,name,OBJPROP_XDISTANCE,TPM_X()+TPM_S(x));
-   ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+TPM_S((tpm_on ? 374 : 64)+y));
-   ObjectSetInteger(0,name,OBJPROP_COLOR,clrWhite);
+   ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+TPM_S((tpm_on ? 374 : 39)+y));
+   ObjectSetInteger(0,name,OBJPROP_COLOR,key=="TITLE"?C'90,180,255':clrWhite);
    ObjectSetInteger(0,name,OBJPROP_BACK,false);
    ObjectSetInteger(0,name,OBJPROP_SELECTABLE,false);
    ObjectSetInteger(0,name,OBJPROP_HIDDEN,true);
@@ -33,7 +33,7 @@ void TPP_Widget(string key,ENUM_OBJECT type,int x,int y,int w,int h,string text,
       ObjectSetInteger(0,name,OBJPROP_BGCOLOR,C'37,44,57');
       ObjectSetInteger(0,name,OBJPROP_BORDER_COLOR,C'65,74,90');
    }
-   ObjectSetInteger(0,name,OBJPROP_FONTSIZE,(int)MathMax(6,TPM_S(10.8)));
+   ObjectSetInteger(0,name,OBJPROP_FONTSIZE,FontSize(key=="TITLE"?BASE_FONT_SECTION:BASE_FONT_NORMAL));
    ObjectSetString(0,name,OBJPROP_FONT,"Arial");
    if(type!=OBJ_EDIT || fresh) ObjectSetString(0,name,OBJPROP_TEXT,text);
    if(type==OBJ_EDIT) ObjectSetInteger(0,name,OBJPROP_READONLY,tpp_at>0);
@@ -84,11 +84,11 @@ void TPP_Render()
    TPP_Widget("TITLE",OBJ_LABEL,12,8,0,0,"PENDING ORDER", "User-directed pending orders: Buy Limit, Sell Limit, Buy Stop and Sell Stop.");
    TPP_Widget("TOGGLE",OBJ_BUTTON,244,6,50,24,tpp_on ? "ON" : "OFF","Show or hide Pending Order. OFF cancels local scheduled placement; broker orders remain unchanged.");
    ObjectSetInteger(0,"TPP_TOGGLE",OBJPROP_BGCOLOR,tpp_on ? C'35,115,80' : C'140,45,45');
-   TPP_Visibility("TPP_",false);
+   if(!tpp_on) TPP_Visibility("TPP_",false);
    ObjectSetInteger(0,"TPP_TITLE",OBJPROP_TIMEFRAMES,OBJ_ALL_PERIODS);
-   ObjectSetInteger(0,"TPP_TITLE",OBJPROP_COLOR,C'90,180,255');
-   ObjectSetInteger(0,"TPP_TITLE",OBJPROP_FONTSIZE,(int)MathMax(6,TPM_S(12.0)));
    if(!tpp_on) return;
+   static string prior_view="";string view=tpp_picker!=""?"calendar":"fields";
+   if(view!=prior_view){TPP_Visibility("TPP_",false);prior_view=view;}
    if(tpp_picker!="") { TPP_Calendar();return; }
    TPP_Widget("TYPE",OBJ_BUTTON,12,33,280,25,tpp_types[tpp_type],"Click to choose Buy Limit, Sell Limit, Buy Stop or Sell Stop.");
    string keys[4]={"VOLUME","ENTRY","SL","TP"};

@@ -73,7 +73,7 @@ bool TPDR_Event(string name)
  daily_target_value=GlobalVariableGet(GV_DAILY_VALUE);double value=daily_target_value;
 #endif
  datetime period=GetSessionStartForTime(TPDL_Now());EnsureSessionState(period);
- GlobalVariableSet(SessionKey(period,"MODE"),next==1?1:0);GlobalVariableSet(SessionKey(period,"TARGET"),value);TPDR_Save(period);
+ // Mode selection edits the form only. Update confirmation saves the active period.
  ObjectSetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT,DoubleToString(value,2));
  ObjectSetInteger(0,name,OBJPROP_STATE,false);UpdatePanel();return true;
 }
@@ -90,15 +90,52 @@ string TPDR_RemainingDisplay(datetime period,double remaining,double balance,str
 }
 
 
-void TPDR_RemainingParts(datetime period,double remaining,double balance,string currency,bool percent,string &primary,string &second,string &third)
+void TPDR_RemainingParts(datetime period,double remaining,double balance,string currency,bool percent,string &primary,string &second,string &third,bool preview=false)
 {
  double risk=GlobalVariableGet(SessionKey(period,"RATIO"))>0?GlobalVariableGet(SessionKey(period,"RATIO_RISK")):TPDR_RiskCash();
  string cash=currency+" "+DoubleToString(remaining,2);
  string percentage=balance>0?DoubleToString(remaining/balance*100,2)+"%":"Percentage pending";
  string ratio=MathIsValidNumber(risk)&&risk>0?"1:"+DoubleToString(remaining/risk,2):"Ratio pending";
- if(GlobalVariableGet(SessionKey(period,"RATIO"))>0){primary=ratio;second="Percentage: "+percentage;third="Cash: "+cash;}
+ if(preview?TPDR_Enabled():GlobalVariableGet(SessionKey(period,"RATIO"))>0){primary=ratio;second="Percentage: "+percentage;third="Cash: "+cash;}
  else if(percent){primary=percentage;second="Cash: "+cash;third="Ratio: "+ratio;}
  else {primary=cash;second="Percentage: "+percentage;third="Ratio: "+ratio;}
+}
+
+
+void TPDR_TargetEquivalents(datetime period,double target,bool percent,string currency)
+{
+ string primary="",second="",third="";
+ double balance=GetSessionStartBalance(period);
+ double risk=GlobalVariableGet(SessionKey(period,"RATIO"))>0 ? GlobalVariableGet(SessionKey(period,"RATIO_RISK")) : TPDR_RiskCash();
+ string cash=currency+" "+DoubleToString(target,2),percentage=balance>0?DoubleToString(target/balance*100,2)+"%":"Percentage pending";
+ string ratio=risk>0?"1:"+DoubleToString(target/risk,2):"Ratio pending";
+ if(TPDR_Enabled()){primary=ratio;second="Percentage: "+percentage;third="Cash: "+cash;}
+ else if(GetDailyTargetMode()==DAILY_PERCENTAGE){primary=percentage;second="Cash: "+cash;third="Ratio: "+ratio;}
+ else {primary=cash;second="Percentage: "+percentage;third="Ratio: "+ratio;}
+ string rows[3];rows[0]="Saved target: "+primary;rows[1]=second;rows[2]=third;
+ string keys[3]={"TradePilot_DAILY_EQUIVALENT","TradePilot_DAILY_OTHER1","TradePilot_DAILY_OTHER2"};
+ for(int i=0;i<3;i++) {
+  int separator=StringFind(rows[i],": ");
+  string caption=separator>=0?StringSubstr(rows[i],0,separator):"Equivalent";
+  string value=separator>=0?StringSubstr(rows[i],separator+2):rows[i];
+  int row_y=PanelY()+S(115+i*16);
+  CreateLabel(keys[i]+"_LABEL",caption,LabelX(),row_y,FontSize(BASE_FONT_NORMAL),C'190,195,205');
+  int size=TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(14));
+  CreateLabel(keys[i],value,ValueX(),row_y,size,C'190,195,205');
+  ObjectSetInteger(0,keys[i],OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
+  ObjectSetString(0,keys[i],OBJPROP_TOOLTIP,"Your saved daily target shown as money, percentage and risk-to-reward. Press Update to apply a new target or mode. Money uses your account currency. Percentage uses this day's starting balance. Ratio uses the planned risk; a missing risk is shown as pending.");
+  ObjectSetString(0,keys[i]+"_LABEL",OBJPROP_TOOLTIP,ObjectGetString(0,keys[i],OBJPROP_TOOLTIP));
+ }
+}
+void TPDR_BudgetEquivalents(datetime period,double remaining,bool verified,bool active,string currency)
+{
+ string text="";
+ if(active && verified) {
+  double balance=GetSessionStartBalance(period),risk=TPDR_RiskCash();
+  text="("+(balance>0 ? DoubleToString(remaining/balance*100,2)+"%" : "Percentage pending")+"; "+(risk>0 ? DoubleToString(remaining/risk,2)+"R" : "Risk pending")+")";
+ }
+ CreateLabel("TradePilot_LIMIT_OTHER",text,ValueX(),PanelY()+S(288),TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(132),S(14)),C'190,195,205');
+ ObjectSetString(0,"TradePilot_LIMIT_OTHER",OBJPROP_TOOLTIP,"Your remaining daily loss allowance shown as a percentage and risk units. One risk unit is the money risk currently entered in Position Sizer. This is available loss allowance, not a profit target.");
 }
 
 #endif

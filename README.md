@@ -4,7 +4,7 @@ Open-source MT4 and MT5 chart tools by Tinashe Chimanikire. Fork this repository
 
 ## What is included
 
-Position Sizer, Daily Performance and Loss Protection, Current Basket and Carry-over, Point Measurer, Pending Orders, chart binding and the optional local TradePilot desktop connection.
+Position Sizer, Daily Performance and Daily Loss Limit, Current Basket and Carry-over, Point Measurer, Pending Orders, chart binding and the optional local TradePilot desktop connection.
 
 The TradePilot desktop subscription application is a separate private project available through Microsoft Store. Its source, payment administration, account database, passwords and connection files are not in this repository.
 
@@ -20,7 +20,7 @@ The TradePilot desktop subscription application is a separate private project av
 
 ## Development status
 
-This is development source, not a certified production release. MT4 and MT5 compilation and isolated desktop regression checks are recorded in the private project. Recent header fitting, label help and flicker corrections still require complete native visual testing. Broker execution, margin calculations and copied demo orders need deliberate testing with fresh prices. A displayed estimate or accepted pending order is not proof that a trade executed.
+This is development source, not a certified production release. MT4 and MT5 compilation and isolated desktop regression checks are recorded in the private project. 235 regression checks pass and both companions compile without errors or warnings. Latest native layout, spread consent and broker execution checks remain release gates. Broker execution, margin calculations and copied demo orders need deliberate testing with fresh prices. A displayed estimate or accepted pending order is not proof that a trade executed.
 
 ## Execution categories
 

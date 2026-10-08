@@ -311,11 +311,20 @@ void TP_BasketProgressRows(datetime period)
   ObjectSetInteger(0,name,OBJPROP_XDISTANCE,value_left);
   ObjectSetInteger(0,name,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
  }
- if(ObjectFind(0,"TradePilot_BASKET_COLUMN_BG")>=0)ObjectSetInteger(0,"TradePilot_BASKET_COLUMN_BG",OBJPROP_YSIZE,S(454));
- if(ObjectFind(0,"TradePilot_CURRENT_BORDER")>=0)ObjectSetInteger(0,"TradePilot_CURRENT_BORDER",OBJPROP_YSIZE,S(354));
+ if(ObjectFind(0,"TradePilot_BASKET_COLUMN_BG")>=0)ObjectSetInteger(0,"TradePilot_BASKET_COLUMN_BG",OBJPROP_YSIZE,S(478));
+ if(ObjectFind(0,"TradePilot_CURRENT_BORDER")>=0)ObjectSetInteger(0,"TradePilot_CURRENT_BORDER",OBJPROP_YSIZE,S(366));
+ // Carry-over owns a padded container; no divider may cross its text.
+ // Resize the existing background only; creating it here would put it above the labels.
+ ObjectSetInteger(0,"TradePilot_CARRY_BORDER",OBJPROP_XDISTANCE,PanelX()+PanelWidth()+S(18));
+ ObjectSetInteger(0,"TradePilot_CARRY_BORDER",OBJPROP_XSIZE,S(292));
+ if(ObjectFind(0,"TradePilot_CARRY_DIVIDER")>=0)ObjectDelete(0,"TradePilot_CARRY_DIVIDER");
+ string carry_labels[]={"CARRY_TITLE","CARRY_BASKETS_LABEL","CARRY_POSITIONS_LABEL","CARRY_PROFIT_LABEL","CARRY_PL_LABEL"};
+ for(int i=0;i<ArraySize(carry_labels);i++){string key="TradePilot_"+carry_labels[i];if(ObjectFind(0,key)<0)continue;ObjectSetInteger(0,key,OBJPROP_XDISTANCE,x);ObjectSetInteger(0,key,OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);}
+ string carry_values[]={"CARRY_BASKETS_VALUE","CARRY_POSITIONS_VALUE","CARRY_PROFIT_VALUE","CARRY_PL_VALUE"};
+ for(int i=0;i<ArraySize(carry_values);i++){string key="TradePilot_"+carry_values[i];if(ObjectFind(0,key)<0)continue;ObjectSetInteger(0,key,OBJPROP_XDISTANCE,value_left);ObjectSetInteger(0,key,OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);string value=ObjectGetString(0,key,OBJPROP_TEXT);ObjectSetInteger(0,key,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));}
  string carry[]={"CARRY_BORDER","CARRY_DIVIDER","CARRY_TITLE","CARRY_BASKETS_LABEL","CARRY_BASKETS_VALUE","CARRY_POSITIONS_LABEL","CARRY_POSITIONS_VALUE","CARRY_PROFIT_LABEL","CARRY_PROFIT_VALUE","CARRY_CURRENCY","CARRY_PL_LABEL","CARRY_PL_VALUE"};
- int carry_rows[]={358,358,368,391,391,411,411,431,431,432,431,431};
- for(int i=0;i<ArraySize(carry);i++){string name="TradePilot_"+carry[i];if(ObjectFind(0,name)<0)continue;ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+S(carry_rows[i]));if(carry[i]=="CARRY_BORDER")ObjectSetInteger(0,name,OBJPROP_YSIZE,S(96));}
+ int carry_rows[]={370,370,380,403,403,423,423,443,443,444,443,443};
+ for(int i=0;i<ArraySize(carry);i++){string name="TradePilot_"+carry[i];if(ObjectFind(0,name)<0)continue;ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+S(carry_rows[i]));if(carry[i]=="CARRY_BORDER")ObjectSetInteger(0,name,OBJPROP_YSIZE,S(108));}
 }
 
 #endif

@@ -296,3 +296,11 @@ The centred percentage field between minus and plus is editable. Type a zoom fro
 
 NUMBER ENTRY ALIGNMENT
 Daily target, Loss limit, Risk, Entry price and Stop-loss input boxes start at the left and extend to the right on both MT4 and MT5. The zoom percentage remains centred between minus and plus. Budget left's bracketed percentage/risk-unit information is aligned to the right edge of its value column.
+
+
+BUDGET LEFT ON ONE LINE
+Budget left shows the cash allowance followed by percentage and risk units in brackets on the same line, with a gap separating them. The complete value is green above zero, red below zero and neutral at zero. Hover to read the full value if a long amount needs a smaller display font. Closed P/L follows on the next evenly spaced row. Carry-over has its own padded border so the words remain inside the container.
+
+
+COMPACT PANEL AND ZOOM SAFETY
+Update follows the same spacing as the labels above it. The empty section gap below Update has been reduced and Position Sizer moved up. Zooming resizes the panel and preserves the target being typed; it does not save that target. Use Update and its confirmation to commit Daily Performance changes. Carry-over's background is drawn before its text to keep every label visible.

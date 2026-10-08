@@ -134,10 +134,13 @@ void TPDR_BudgetEquivalents(datetime period,double remaining,bool verified,bool 
   double balance=GetSessionStartBalance(period),risk=TPDR_RiskCash();
   text="("+(balance>0 ? DoubleToString(remaining/balance*100,2)+"%" : "Percentage pending")+"; "+(risk>0 ? DoubleToString(remaining/risk,2)+"R" : "Risk pending")+")";
  }
- CreateLabel("TradePilot_LIMIT_OTHER",text,ValueX(),PanelY()+S(291),TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(132),S(14)),!verified?C'190,195,205':remaining<0?clrRed:remaining>0?C'90,220,140':clrWhite);
- ObjectSetInteger(0,"TradePilot_LIMIT_OTHER",OBJPROP_ANCHOR,ANCHOR_RIGHT_UPPER);
- ObjectSetInteger(0,"TradePilot_LIMIT_OTHER",OBJPROP_XDISTANCE,ValueX()+S(130));
- ObjectSetString(0,"TradePilot_LIMIT_OTHER",OBJPROP_TOOLTIP,"Your remaining daily loss allowance shown as a percentage and risk units. One risk unit is the money risk currently entered in Position Sizer. This is available loss allowance, not a profit target.");
+ // One fitted value keeps the cash amount and equivalents together on the Budget left row.
+ string key="TradePilot_LIMIT_REMAIN",amount=ObjectGetString(0,key,OBJPROP_TEXT);
+ string display=amount+(text!=""?"  "+text:"");
+ ObjectSetString(0,key,OBJPROP_TEXT,display);
+ ObjectSetInteger(0,key,OBJPROP_FONTSIZE,TP_HeaderFont(display,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
+ ObjectSetString(0,key,OBJPROP_TOOLTIP,"Your remaining daily loss allowance. The cash amount is followed by its percentage and risk-unit equivalents in brackets. Green means allowance remains; red means losses exceed it. One risk unit is the cash risk currently entered in Position Sizer. This is loss allowance, not a profit target. "+display);
+ if(ObjectFind(0,"TradePilot_LIMIT_OTHER")>=0)ObjectDelete(0,"TradePilot_LIMIT_OTHER");
 }
 
 #endif

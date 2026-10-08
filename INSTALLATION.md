@@ -56,4 +56,4 @@ If TradePilot does not appear in Navigator, verify you used **this terminal's** 
 
 ## Development status
 
-This is MIT-licensed development source. The latest build passes 235 desktop regression checks and both native compilations without errors or warnings. Remaining native checks, broker execution tests and final release packaging must pass before the next Microsoft submission. See [README](README.md) for repository scope and [Admin Guide](ADMIN-GUIDE.txt) for desktop administration.
+This is MIT-licensed development source. The latest build passes 237 desktop regression checks and both native compilations without errors or warnings. Remaining native checks, broker execution tests and final release packaging must pass before the next Microsoft submission. See [README](README.md) for repository scope and [Admin Guide](ADMIN-GUIDE.txt) for desktop administration.

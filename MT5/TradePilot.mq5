@@ -23,7 +23,7 @@ bool tp_spread_pending_calculation=false;
 #define BASE_PANEL_X       12
 #define BASE_PANEL_Y       16
 #define BASE_PANEL_WIDTH   304
-#define BASE_PANEL_HEIGHT  740
+#define BASE_PANEL_HEIGHT  724
 
 #define BASE_LABEL_X       11
 #define BASE_VALUE_X       160
@@ -2573,6 +2573,8 @@ void CreatePanel()
                 px + S(258), py + S(21), S(24), S(20), C'55,60,70');
 
    CreateRectangle("TradePilot_BASKET_COLUMN_BG",PanelX()+PanelWidth()+S(12),PanelY(),S(304),S(322),C'25,28,35',C'70,75,85');
+   // Create the Carry-over background before its labels so it cannot cover them.
+   CreateRectangle("TradePilot_CARRY_BORDER",PanelX()+PanelWidth()+S(18),PanelY()+S(370),S(292),S(108),C'25,28,35',C'70,75,85');
    // CURRENT BASKET
    CreateLabel("TradePilot_BASKET_TITLE", "CURRENT BASKET",
                LabelX(), py + S(51), FontSize(BASE_FONT_SECTION), C'90,180,255');
@@ -2633,97 +2635,97 @@ void CreatePanel()
                UnitX(), py + S(98), FontSize(BASE_FONT_SMALL), clrWhite);
 
    CreateLabel("TradePilot_DAILY_CLOSED_LABEL", "Closed P/L",
-               LabelX(), py + S(305), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_DAILY_CLOSED_VALUE", "0.00", py + S(305), clrWhite);
+               LabelX(), py + S(289), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_DAILY_CLOSED_VALUE", "0.00", py + S(289), clrWhite);
    CreateLabel("TradePilot_DAILY_CURRENCY", account_currency,
-               UnitX(), py + S(306), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(290), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_DAILY_PERCENT_LABEL", "Closed P/L %",
-               LabelX(), py + S(324), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_DAILY_PERCENT_VALUE", "0.00", py + S(324), clrWhite);
+               LabelX(), py + S(308), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_DAILY_PERCENT_VALUE", "0.00", py + S(308), clrWhite);
    CreateLabel("TradePilot_DAILY_PERCENT_UNIT", "%",
-               UnitX(), py + S(325), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(309), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_REMAINING_LABEL", "Remaining Target",
-               LabelX(), py + S(343), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_REMAINING_VALUE", "0.00", py + S(343), C'255,190,80');
+               LabelX(), py + S(327), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_REMAINING_VALUE", "0.00", py + S(327), C'255,190,80');
    CreateLabel("TradePilot_REMAINING_UNIT", "%",
-               UnitX(), py + S(344), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(328), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_DAILY_STATUS_LABEL", "Status",
-               LabelX(), py + S(362), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_DAILY_STATUS_VALUE", "IN PROGRESS", py + S(362), C'255,190,80');
+               LabelX(), py + S(346), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_DAILY_STATUS_VALUE", "IN PROGRESS", py + S(346), C'255,190,80');
 
    // POSITION SIZER
-   CreateRectangle("TradePilot_SIZER_DIVIDER", LabelX(), py + S(416), pw - S(22), 1,
+   CreateRectangle("TradePilot_SIZER_DIVIDER", LabelX(), py + S(400), pw - S(22), 1,
                    C'65,70,80', C'65,70,80');
    CreateLabel("TradePilot_SIZER_TITLE", "POSITION SIZER",
-               LabelX(), py + S(426), FontSize(BASE_FONT_SECTION), C'90,180,255');
+               LabelX(), py + S(410), FontSize(BASE_FONT_SECTION), C'90,180,255');
 
    CreateLabel("TradePilot_SYMBOL_LABEL", "Symbol",
-               LabelX(), py + S(448), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_SYMBOL_VALUE", _Symbol, py + S(448), clrWhite);
+               LabelX(), py + S(432), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_SYMBOL_VALUE", _Symbol, py + S(432), clrWhite);
 
    CreateLabel("TradePilot_SPREAD_LABEL", "Spread",
-               LabelX(), py + S(467), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_SPREAD_VALUE", "0.0", py + S(467), clrWhite);
+               LabelX(), py + S(451), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_SPREAD_VALUE", "0.0", py + S(451), clrWhite);
    CreateLabel("TradePilot_SPREAD_UNIT", "points",
-               UnitX(), py + S(468), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(452), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_RISK_MODE_LABEL", "Risk Mode",
-               LabelX(), py + S(491), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+               LabelX(), py + S(475), FontSize(BASE_FONT_NORMAL), C'190,195,205');
    CreateButton("TradePilot_RISK_MODE_BUTTON", "Percentage",
-                ValueX(), py + S(485), S(88), S(19), C'55,60,70');
+                ValueX(), py + S(469), S(88), S(19), C'55,60,70');
 
    CreateLabel("TradePilot_RISK_LABEL", "Risk",
-               LabelX(), py + S(515), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateEdit("TradePilot_RISK_EDIT", "1.00", ValueX(), py + S(509), S(72));
+               LabelX(), py + S(499), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateEdit("TradePilot_RISK_EDIT", "1.00", ValueX(), py + S(493), S(72));
    CreateLabel("TradePilot_RISK_UNIT", "%",
-               UnitX(), py + S(516), FontSize(BASE_FONT_SMALL), clrWhite);
+               UnitX(), py + S(500), FontSize(BASE_FONT_SMALL), clrWhite);
 
    CreateLabel("TradePilot_ENTRY_LABEL", "Entry Price",
-               LabelX(), py + S(539), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+               LabelX(), py + S(523), FontSize(BASE_FONT_NORMAL), C'190,195,205');
    CreateEdit("TradePilot_ENTRY_EDIT", DoubleToString(current_price, digits),
-              ValueX(), py + S(533), S(88));
+              ValueX(), py + S(517), S(88));
 
    CreateLabel("TradePilot_SL_LABEL", "Stop Loss",
-               LabelX(), py + S(563), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateEdit("TradePilot_SL_EDIT", "", ValueX(), py + S(557), S(88));
+               LabelX(), py + S(547), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateEdit("TradePilot_SL_EDIT", "", ValueX(), py + S(541), S(88));
 
-   CreateButton("TradePilot_SPREAD_TOGGLE",tp_spread_on?"SPREAD ON":"SPREAD OFF",LabelX(),py + S(581),S(130),S(19),tp_spread_on?C'45,115,75':C'110,55,55');
+   CreateButton("TradePilot_SPREAD_TOGGLE",tp_spread_on?"SPREAD ON":"SPREAD OFF",LabelX(),py + S(565),S(130),S(19),tp_spread_on?C'45,115,75':C'110,55,55');
    ObjectSetString(0,"TradePilot_SPREAD_TOGGLE",OBJPROP_TOOLTIP,"ON moves the planned stop one current spread farther from entry and recalculates size. OFF restores the unadjusted stop. Starts OFF. It does not change stops on existing trades.");
    CreateButton("TradePilot_SL_LINE_BUTTON", sl_line_enabled ? "SL LINE ON" : "SL LINE OFF",
-                ValueX(), py + S(581), S(124), S(19), sl_line_enabled ? C'45,105,75' : C'110,55,55');
+                ValueX(), py + S(565), S(124), S(19), sl_line_enabled ? C'45,105,75' : C'110,55,55');
 
    CreateLabel("TradePilot_SIZE_LABEL", "Calculated Size",
-               LabelX(), py + S(606), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_SIZE_VALUE", "Not calculated", py + S(606), C'255,190,80');
+               LabelX(), py + S(590), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_SIZE_VALUE", "Not calculated", py + S(590), C'255,190,80');
    CreateLabel("TradePilot_SIZE_UNIT", "lots",
-               UnitX(), py + S(607), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(591), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_BROKER_MAX_LABEL", "Broker Max",
-               LabelX(), py + S(625), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+               LabelX(), py + S(609), FontSize(BASE_FONT_NORMAL), C'190,195,205');
    CreateValue("TradePilot_BROKER_MAX_VALUE",
                DoubleToString(SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX), 2),
-               py + S(625), clrWhite);
+               py + S(609), clrWhite);
    CreateLabel("TradePilot_BROKER_MAX_UNIT", "lots",
-               UnitX(), py + S(626), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(610), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_MARGIN_LABEL", "Required Margin",
-               LabelX(), py + S(650), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_MARGIN_VALUE", "Not verified", py + S(650), clrWhite);
+               LabelX(), py + S(634), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_MARGIN_VALUE", "Not verified", py + S(634), clrWhite);
    CreateLabel("TradePilot_MARGIN_UNIT", account_currency,
-               UnitX(), py + S(651), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(635), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
 
    CreateButton("TradePilot_CALCULATE_BUTTON", "CALCULATE",
-                LabelX(), py + S(674), pw - S(22), S(21), C'45,105,155');
+                LabelX(), py + S(658), pw - S(22), S(21), C'45,105,155');
 
    CreateButton(
       "TradePilot_BUY_BUTTON",
       "BUY",
       LabelX(),
-      py + S(700),
+      py + S(684),
       S(132),
       S(22),
       C'45,115,75'
@@ -2733,7 +2735,7 @@ void CreatePanel()
       "TradePilot_SELL_BUTTON",
       "SELL",
       LabelX() + S(138),
-      py + S(700),
+      py + S(684),
       S(132),
       S(22),
       C'120,60,60'
@@ -2790,16 +2792,7 @@ void RebuildResponsivePanel()
       );
 
 
-   if(StringToDouble(daily_target) > 0)
-   {
-      GlobalVariableSet(
-         GV_DAILY_TARGET,
-         StringToDouble(
-            daily_target
-         )
-      );
-   }
-
+   // Resizing must never commit pending Daily Performance edits.
 
    double old_stop =
       StringToDouble(stop);
@@ -2812,6 +2805,7 @@ void RebuildResponsivePanel()
 
 
    CreatePanel();
+   ObjectSetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT,daily_target);
 
 
    if(StringToDouble(risk) > 0)
@@ -3922,7 +3916,7 @@ void TP_DailyChoiceRender()
  int x=LabelX(),y=PanelY()+S(170);
  CreateButton("TradePilot_DAILY_CHOICE_WINS",(tp_daily_wins ? "[X]" : "[ ]")+" Apply wins",x,y,S(130),S(20),tp_daily_wins?C'35,115,80':C'140,45,45');
  CreateButton("TradePilot_DAILY_CHOICE_LOSSES",(tp_daily_losses ? "[X]" : "[ ]")+" Apply losses",ValueX(),y,S(130),S(20),tp_daily_losses?C'35,115,80':C'140,45,45');
- CreateButton("TradePilot_DAILY_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,PanelY()+S(386),S(88),S(19),C'55,60,70');
+ CreateButton("TradePilot_DAILY_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,PanelY()+S(365),S(88),S(19),C'55,60,70');
  ObjectSetString(0,"TradePilot_DAILY_UPDATE",OBJPROP_TOOLTIP,"Click to save Daily Performance: target, Apply wins, Apply losses and daily loss protection. Red/green applies to ON/OFF switches; Update is a save action. Invalid input leaves settings unchanged.");
  ObjectSetString(0,"TradePilot_DAILY_CHOICE_WINS",OBJPROP_TOOLTIP,"Default OFF. Turn ON to count this daily basket's positive net results, including open profits, toward its target. Press Update to save for this period. Reports always retain actual results.");
  ObjectSetString(0,"TradePilot_DAILY_CHOICE_LOSSES",OBJPROP_TOOLTIP,"Default OFF. Turn ON to include this daily basket's negative net results, including open losses, so losses increase the amount needed to reach its target. Press Update to save. Daily loss protection always counts all results.");
@@ -4031,7 +4025,7 @@ void TP_SpreadTradeClose()
 }
 void TP_SpreadTradePrompt()
 {
- int x=LabelX(),y=PanelY()+S(630);
+ int x=LabelX(),y=PanelY()+S(614);
  string text=tp_spread_pending_calculation?"Spread OFF. Continue calculating?":"Spread OFF. Continue with this trade?";
  CreateRectangle("TradePilot_SPREAD_CONFIRM_BG",x-S(4),y-S(5),S(286),S(70),C'25,28,35',C'110,125,145');
  CreateLabel("TradePilot_SPREAD_CONFIRM_TEXT",text,x,y,TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(278),S(16)),clrWhite);

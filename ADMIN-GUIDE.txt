@@ -284,3 +284,11 @@ Calculate opens an in-chart Continue/Cancel notice when Spread is OFF. Continue 
 
 REPORT TOTALS AND CARRY-OVER BALANCES
 Carry-over always keeps its known cash result and broker account currency visible. If the original balance is not available, Percentage pending appears beside that amount until the balance can be verified. Analytics with no completed trades shows zero Wins, zero Losses and a 0/0 (W/L) trade count. These zeros describe completed outcomes only; they do not imply there are no open positions.
+
+
+DAILY LOSS BUDGET DISPLAY
+Budget left and its bracketed percentage/risk-unit equivalents share the right-hand value column. Positive allowance is green, negative allowance is red, and zero is neutral. A negative amount shows how far results have exceeded the allowance; it never authorises new risk. Daily entry blocking remains separate from the displayed colour. Current Basket uses the same row spacing between Spread estimate and Wins, the last target equivalent and Status, and Status and Carry-over.
+
+
+EXACT PANEL ZOOM
+The centred percentage field between minus and plus is editable. Type a zoom from 50% to 150%, then press Enter or click outside to apply. Invalid values leave the existing setting unchanged. Minus and plus adjust one percentage point at a time. Automatic fitting may further reduce panel size in a small chart window.

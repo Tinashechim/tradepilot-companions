@@ -245,13 +245,13 @@ void TP_BasketProgressRows(datetime period)
  CreateRectangle("TradePilot_TOTAL_RIGHT",total_x+total_w,total_y,1,total_h,C'110,125,145',C'110,125,145');
  ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_LABEL",OBJPROP_YDISTANCE,PanelY()+S(242));ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_VALUE",OBJPROP_YDISTANCE,PanelY()+S(242));
  string names[]={"PROFIT_LABEL","PROFIT_VALUE","TP_VALUE_LABEL","TARGET_VALUE","TARGET_OTHER1","TARGET_OTHER2","STATUS_LABEL","STATUS_VALUE","BASKET_COSTS","BASKET_SWAP","BASKET_SPREAD","BASKET_GROSS"};
- int positions[]={203,203,284,284,305,326,357,357,67,87,107,424};
+ int positions[]={203,203,284,284,305,326,347,347,67,87,107,424};
  for(int i=0;i<ArraySize(names);i++)if(ObjectFind(0,"TradePilot_"+names[i])>=0)ObjectSetInteger(0,"TradePilot_"+names[i],OBJPROP_YDISTANCE,PanelY()+S(positions[i]));
  int wins=0,losses=0;double win_result=0,loss_result=0;
  bool outcomes=TP_BasketOutcomes(period,wins,losses,win_result,loss_result);
  string outcome_keys[]={"WINS","LOSSES"};string outcome_titles[]={"Wins","Losses"};
  for(int i=0;i<2;i++) {
-  string key="TradePilot_BASKET_"+outcome_keys[i];int row=137+i*20;
+  string key="TradePilot_BASKET_"+outcome_keys[i];int row=127+i*20;
   string main="Verification pending",other1="",other2="";
   if(outcomes)TPDR_RemainingParts(period,i==0?win_result:loss_result,GetSessionStartBalance(period),currency,GlobalVariableGet(GV_DAILY_MODE)>0.5,main,other1,other2,true);
   StringReplace(other1,"Percentage: ","");StringReplace(other1,"Cash: ","");StringReplace(other1,"Ratio: ","");
@@ -267,8 +267,8 @@ void TP_BasketProgressRows(datetime period)
   ObjectSetString(0,key+"_LABEL",OBJPROP_TOOLTIP,help);ObjectSetString(0,key+"_VALUE",OBJPROP_TOOLTIP,help);
  }
  ObjectDelete(0,"TradePilot_BASKET_WINS_COUNT");ObjectDelete(0,"TradePilot_BASKET_LOSSES_COUNT");
- CreateLabel("TradePilot_BASKET_TRADE_COUNT_LABEL","Trade count",x,PanelY()+S(177),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateLabel("TradePilot_BASKET_TRADE_COUNT_VALUE",outcomes?IntegerToString(wins)+"/"+IntegerToString(losses)+" (W/L)":"Count pending",vx,PanelY()+S(177),FontSize(BASE_FONT_NORMAL),clrWhite);
+ CreateLabel("TradePilot_BASKET_TRADE_COUNT_LABEL","Trade count",x,PanelY()+S(167),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateLabel("TradePilot_BASKET_TRADE_COUNT_VALUE",outcomes?IntegerToString(wins)+"/"+IntegerToString(losses)+" (W/L)":"Count pending",vx,PanelY()+S(167),FontSize(BASE_FONT_NORMAL),clrWhite);
  string count_help="Completed wins / completed losses in this day's basket. 1/2 (W/L) means one win and two losses. Open and break-even trades are excluded. MT5 counts fully closed positions; MT4 counts closed broker tickets. Apply wins/losses does not change these actual counts.";
  ObjectSetString(0,"TradePilot_BASKET_TRADE_COUNT_LABEL",OBJPROP_TOOLTIP,count_help);ObjectSetString(0,"TradePilot_BASKET_TRADE_COUNT_VALUE",OBJPROP_TOOLTIP,count_help);
  // Floating P/L has a subtler outline; Total P/L remains the stronger total.
@@ -311,10 +311,10 @@ void TP_BasketProgressRows(datetime period)
   ObjectSetInteger(0,name,OBJPROP_XDISTANCE,value_left);
   ObjectSetInteger(0,name,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
  }
- if(ObjectFind(0,"TradePilot_BASKET_COLUMN_BG")>=0)ObjectSetInteger(0,"TradePilot_BASKET_COLUMN_BG",OBJPROP_YSIZE,S(490));
- if(ObjectFind(0,"TradePilot_CURRENT_BORDER")>=0)ObjectSetInteger(0,"TradePilot_CURRENT_BORDER",OBJPROP_YSIZE,S(384));
+ if(ObjectFind(0,"TradePilot_BASKET_COLUMN_BG")>=0)ObjectSetInteger(0,"TradePilot_BASKET_COLUMN_BG",OBJPROP_YSIZE,S(454));
+ if(ObjectFind(0,"TradePilot_CURRENT_BORDER")>=0)ObjectSetInteger(0,"TradePilot_CURRENT_BORDER",OBJPROP_YSIZE,S(354));
  string carry[]={"CARRY_BORDER","CARRY_DIVIDER","CARRY_TITLE","CARRY_BASKETS_LABEL","CARRY_BASKETS_VALUE","CARRY_POSITIONS_LABEL","CARRY_POSITIONS_VALUE","CARRY_PROFIT_LABEL","CARRY_PROFIT_VALUE","CARRY_CURRENCY","CARRY_PL_LABEL","CARRY_PL_VALUE"};
- int carry_rows[]={394,394,404,427,427,447,447,467,467,468,467,467};
+ int carry_rows[]={358,358,368,391,391,411,411,431,431,432,431,431};
  for(int i=0;i<ArraySize(carry);i++){string name="TradePilot_"+carry[i];if(ObjectFind(0,name)<0)continue;ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+S(carry_rows[i]));if(carry[i]=="CARRY_BORDER")ObjectSetInteger(0,name,OBJPROP_YSIZE,S(96));}
 }
 

@@ -134,7 +134,9 @@ void TPDR_BudgetEquivalents(datetime period,double remaining,bool verified,bool 
   double balance=GetSessionStartBalance(period),risk=TPDR_RiskCash();
   text="("+(balance>0 ? DoubleToString(remaining/balance*100,2)+"%" : "Percentage pending")+"; "+(risk>0 ? DoubleToString(remaining/risk,2)+"R" : "Risk pending")+")";
  }
- CreateLabel("TradePilot_LIMIT_OTHER",text,ValueX(),PanelY()+S(288),TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(132),S(14)),C'190,195,205');
+ CreateLabel("TradePilot_LIMIT_OTHER",text,ValueX(),PanelY()+S(291),TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(132),S(14)),!verified?C'190,195,205':remaining<0?clrRed:remaining>0?C'90,220,140':clrWhite);
+ ObjectSetInteger(0,"TradePilot_LIMIT_OTHER",OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
+ ObjectSetInteger(0,"TradePilot_LIMIT_OTHER",OBJPROP_XDISTANCE,ValueX());
  ObjectSetString(0,"TradePilot_LIMIT_OTHER",OBJPROP_TOOLTIP,"Your remaining daily loss allowance shown as a percentage and risk units. One risk unit is the money risk currently entered in Position Sizer. This is available loss allowance, not a profit target.");
 }
 

@@ -160,8 +160,13 @@ void TPDL_Render()
 #else
  AccountCurrency();
 #endif
- CreateValue("TradePilot_LIMIT_REMAIN",TPDL_Limit()<=0?"No daily limit":!verified?"Not verified":blocked?"Limit reached":currency+" "+DoubleToString(remaining,2),y+S(270),blocked||!verified?clrRed:clrWhite);
- TPDR_BudgetEquivalents(GetSessionStartForTime(TPDL_Now()),remaining,verified,TPDL_Limit()>0,currency);
+ // Show the signed allowance while keeping the risk-cap calculation clamped at zero.
+ double displayed_budget=TPDL_Cash()+net;
+ color budget_color=!verified?C'190,195,205':displayed_budget<0?clrRed:displayed_budget>0?C'90,220,140':clrWhite;
+ CreateValue("TradePilot_LIMIT_REMAIN",TPDL_Limit()<=0?"No daily limit":!verified?"Not verified":currency+" "+DoubleToString(displayed_budget,2),y+S(270),budget_color);
+ ObjectSetInteger(0,"TradePilot_LIMIT_REMAIN",OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
+ ObjectSetInteger(0,"TradePilot_LIMIT_REMAIN",OBJPROP_XDISTANCE,ValueX());
+ TPDR_BudgetEquivalents(GetSessionStartForTime(TPDL_Now()),displayed_budget,verified,TPDL_Limit()>0,currency);
  ObjectSetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TOOLTIP,"Optional daily loss limit. Leave blank for no daily entry limit. Percentage uses the broker-period starting balance; cash uses account currency. Includes all open floating results and net closed results since 23:30.");
  ObjectSetString(0,"TradePilot_LIMIT_MODE",OBJPROP_TOOLTIP,"Choose Percentage or Cash, then press the shared Update button to save. Editing alone does not change the active limit.");
  string reason="";if(!TPDL_EntryAllowed(reason)) {

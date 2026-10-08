@@ -2559,14 +2559,16 @@ void CreatePanel()
    // Manual panel scaling. Automatic monitor/chart fitting remains active,
    // while these controls let the user fine-tune the result.
    CreateButton("TradePilot_SCALE_MINUS", "-",
-                px + S(216), py + S(22), S(18), S(17), C'55,60,70');
+                px + S(184), py + S(21), S(24), S(20), C'55,60,70');
 
-   CreateLabel("TradePilot_SCALE_VALUE",
-               IntegerToString((int)MathRound(manual_panel_scale * 100.0)) + "%",
-               px + S(237), py + S(25), FontSize(BASE_FONT_SMALL), C'200,205,215');
+   CreateEdit("TradePilot_SCALE_VALUE",DoubleToString(manual_panel_scale*100.0,1)+"%",px+S(211),py+S(21),S(44));
+   ObjectSetInteger(0,"TradePilot_SCALE_VALUE",OBJPROP_YSIZE,S(20));
+   ObjectSetInteger(0,"TradePilot_SCALE_VALUE",OBJPROP_ALIGN,ALIGN_CENTER);
+   ObjectSetInteger(0,"TradePilot_SCALE_VALUE",OBJPROP_FONTSIZE,FontSize(BASE_FONT_SMALL));
+   ObjectSetString(0,"TradePilot_SCALE_VALUE",OBJPROP_TOOLTIP,"Type your preferred zoom from 50% to 150%, then press Enter or click outside to apply. Minus and plus adjust it one percentage point at a time. Chart fitting may reduce the displayed panel size on small windows.");
 
    CreateButton("TradePilot_SCALE_PLUS", "+",
-                px + S(276), py + S(22), S(18), S(17), C'55,60,70');
+                px + S(258), py + S(21), S(24), S(20), C'55,60,70');
 
    CreateRectangle("TradePilot_BASKET_COLUMN_BG",PanelX()+PanelWidth()+S(12),PanelY(),S(304),S(322),C'25,28,35',C'70,75,85');
    // CURRENT BASKET
@@ -3221,6 +3223,20 @@ void OnChartEvent(
    const string &sparam
 )
 {
+ if(id==CHARTEVENT_OBJECT_ENDEDIT && sparam=="TradePilot_SCALE_VALUE") {
+  if(tp_spread_confirm_open||tpc_open||tpdc_open){ObjectSetString(0,sparam,OBJPROP_TEXT,DoubleToString(manual_panel_scale*100.0,1)+"%");return;}
+  string text=ObjectGetString(0,sparam,OBJPROP_TEXT);StringTrimLeft(text);StringTrimRight(text);
+  if(StringLen(text)>0 && StringSubstr(text,StringLen(text)-1)=="%")text=StringSubstr(text,0,StringLen(text)-1);
+  bool valid=StringLen(text)>0;bool dot=false;
+  for(int i=0;i<StringLen(text);i++){ushort c=StringGetCharacter(text,i);if(c==46&&!dot){dot=true;continue;}if(c<48||c>57)valid=false;}
+  double percent=StringToDouble(text);
+  if(!valid||!MathIsValidNumber(percent)||percent<50||percent>150){Alert("Enter a zoom percentage from 50 to 150, for example 100%.");ObjectSetString(0,sparam,OBJPROP_TEXT,DoubleToString(manual_panel_scale*100.0,1)+"%");return;}
+  manual_panel_scale=percent/100.0;
+
+  GlobalVariableSet(GV_PANEL_SCALE,manual_panel_scale);GlobalVariablesFlush();
+  RebuildResponsivePanel();TPM_Render();return;
+ }
+
  if(id==CHARTEVENT_OBJECT_CLICK && tp_spread_confirm_open) {
   if(sparam=="TradePilot_SPREAD_CONFIRM_CANCEL"){TP_SpreadTradeClose();return;}
   if(sparam=="TradePilot_SPREAD_CONFIRM_CONTINUE"){int side=tp_spread_pending_side;bool calculation=tp_spread_pending_calculation;TP_SpreadTradeClose();if(calculation)TP_CalculateRequested(true);else ExecutePanelTrade((ENUM_ORDER_TYPE)side,true);return;}

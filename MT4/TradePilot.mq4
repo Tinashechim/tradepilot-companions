@@ -1482,7 +1482,7 @@ void CreateEdit(
    ObjectSetInteger(0, name, OBJPROP_FONTSIZE, FontSize(BASE_FONT_SMALL));
    ObjectSetString(0, name, OBJPROP_FONT, "Arial");
    ObjectSetString(0, name, OBJPROP_TEXT, text);
-   ObjectSetInteger(0, name, OBJPROP_ALIGN, ALIGN_RIGHT);
+   ObjectSetInteger(0, name, OBJPROP_ALIGN, ALIGN_LEFT);
    ObjectSetInteger(0, name, OBJPROP_READONLY, false);
    ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
    ObjectSetInteger(0, name, OBJPROP_SELECTED, false);

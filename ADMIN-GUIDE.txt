@@ -292,3 +292,7 @@ Budget left and its bracketed percentage/risk-unit equivalents share the right-h
 
 EXACT PANEL ZOOM
 The centred percentage field between minus and plus is editable. Type a zoom from 50% to 150%, then press Enter or click outside to apply. Invalid values leave the existing setting unchanged. Minus and plus adjust one percentage point at a time. Automatic fitting may further reduce panel size in a small chart window.
+
+
+NUMBER ENTRY ALIGNMENT
+Daily target, Loss limit, Risk, Entry price and Stop-loss input boxes start at the left and extend to the right on both MT4 and MT5. The zoom percentage remains centred between minus and plus. Budget left's bracketed percentage/risk-unit information is aligned to the right edge of its value column.

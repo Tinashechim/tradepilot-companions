@@ -2474,6 +2474,8 @@ void CreateEdit(
    else if(StringFind(name,"ENTRY_EDIT")>=0) help="Planned entry price, for example 1.08500 for EURUSD. The executed price can differ from this estimate.";
    else if(StringFind(name,"SL_EDIT")>=0) help="Stop-loss price, for example 1.08000 below a BUY entry at 1.08500. For a SELL, place the stop above entry. You can also drag the stop line.";
    ObjectSetString(0,name,OBJPROP_TOOLTIP,help);
+   ObjectSetInteger(0,name,OBJPROP_ALIGN,ALIGN_LEFT);
+
 }
 
 

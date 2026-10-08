@@ -8,6 +8,10 @@ Position Sizer, Daily Performance and Daily Loss Limit, Current Basket and Carry
 
 The TradePilot desktop subscription application is a separate private project available through Microsoft Store. Its source, payment administration, account database, passwords and connection files are not in this repository.
 
+## Installation guide
+
+Follow the [step-by-step MT4 and MT5 installation guide](INSTALLATION.md), including compilation, chart attachment, permissions and troubleshooting.
+
 ## Build and try the tools
 
 1. Fork or clone this repository.

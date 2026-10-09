@@ -69,3 +69,6 @@ Before updating Daily Loss Limit, open Current Basket and check Wins, Losses, Tr
 
 ## Independent daily controls (1.0.29)
 Daily Performance and Daily Loss Limit each have their own Apply wins/losses controls above Update. Performance subtracts selected completed Current Basket wins from its base target and adds selected losses. Loss Limit adds selected wins to its allowance and subtracts selected losses. Preview changes immediately; the section's Update and Yes saves it. Enter in either input opens the same review. Repeated updates count completed outcomes once. Daily Performance shows Closed P/L and Remaining target; Budget left stays in Daily Loss Limit. Both sets start OFF for a new broker day. Turning a display panel ON does not enable trading. Layout and live outcome checks remain separate from successful compilation.
+
+## Basket display correction (1.0.30)
+Current Basket stays hidden while OFF, including intermediate redraws when the main panel expands. Trading permissions and account settings are unchanged. Close the intended terminal before replacing its compiled companion.

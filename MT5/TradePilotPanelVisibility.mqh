@@ -1,6 +1,17 @@
 #ifndef TRADEPILOT_PANEL_VISIBILITY
 #define TRADEPILOT_PANEL_VISIBILITY
-bool tp_main_open=false,tp_basket_open=false;
+bool TP_IsBasketObject(string key)
+{
+ if(StringFind(key,"TradePilot_")!=0)return false;
+ string suffix=StringSubstr(key,StringLen("TradePilot_"));
+ string names="|CURRENT_BORDER|BASKET_TITLE|POSITIONS_LABEL|POSITIONS_VALUE|PROFIT_LABEL|PROFIT_VALUE|TP_VALUE_LABEL|TARGET_VALUE|TARGET_UNIT|STATUS_LABEL|STATUS_VALUE|";
+ return StringFind(names,"|"+suffix+"|")>=0 || StringFind(suffix,"CARRY_")==0 || StringFind(suffix,"BASKET_")==0 || StringFind(suffix,"FLOAT_")==0 || suffix=="FLOATING_EQUIVALENTS" || StringFind(suffix,"TOTAL_")==0;
+}
+void TP_ApplyBasketVisibility(string name)
+{
+ // Apply before any intermediate chart redraw can expose an OFF basket.
+ if(TP_IsBasketObject(name))ObjectSetInteger(0,name,OBJPROP_TIMEFRAMES,tp_basket_open?OBJ_ALL_PERIODS:OBJ_NO_PERIODS);
+}
 void TP_PanelVisibility()
 {
  int main_x=PanelX(),basket_x=PanelX()+PanelWidth()+S(12),top=PanelY();
@@ -14,9 +25,7 @@ void TP_PanelVisibility()
   long x=ObjectGetInteger(0,key,OBJPROP_XDISTANCE);
   // Basket ownership is fixed by object identity, not transient coordinates
   // while a resize/update rebuilds labels at their original main-column positions.
-  string suffix=StringSubstr(key,StringLen("TradePilot_"));
-  string basket_names="|CURRENT_BORDER|BASKET_TITLE|POSITIONS_LABEL|POSITIONS_VALUE|PROFIT_LABEL|PROFIT_VALUE|TP_VALUE_LABEL|TARGET_VALUE|TARGET_UNIT|STATUS_LABEL|STATUS_VALUE|";
-  bool basket=StringFind(basket_names,"|"+suffix+"|")>=0 || StringFind(suffix,"CARRY_")==0 || StringFind(suffix,"BASKET_")==0 || StringFind(suffix,"FLOAT_")==0 || suffix=="FLOATING_EQUIVALENTS" || StringFind(suffix,"TOTAL_")==0;
+  bool basket=TP_IsBasketObject(key);
   bool open=basket?tp_basket_open:tp_main_open;
   long desired=open?OBJ_ALL_PERIODS:OBJ_NO_PERIODS;
   if(ObjectGetInteger(0,key,OBJPROP_TIMEFRAMES)!=desired)ObjectSetInteger(0,key,OBJPROP_TIMEFRAMES,desired);

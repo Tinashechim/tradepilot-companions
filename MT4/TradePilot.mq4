@@ -1340,6 +1340,9 @@ void CalculatePanelScale()
 // OBJECT HELPERS
 // ============================================================
 
+bool tp_main_open=false,tp_basket_open=false;
+void TP_ApplyBasketVisibility(string name);
+
 void CreateRectangle(
    string name,
    int x,
@@ -1353,6 +1356,7 @@ void CreateRectangle(
    // Retain object creation order so overlays and their controls stay visible.
    if(ObjectFind(0,name)>=0 && (ENUM_OBJECT)ObjectGetInteger(0,name,OBJPROP_TYPE)!=OBJ_RECTANGLE_LABEL)ObjectDelete(0,name);
    if(ObjectFind(0,name)<0 && !ObjectCreate(0,name,OBJ_RECTANGLE_LABEL,0,0,0))return;
+   TP_ApplyBasketVisibility(name);
 
    ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
    ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);
@@ -1390,6 +1394,7 @@ void CreateLabel(
    // Retain object creation order so overlays and their controls stay visible.
    if(ObjectFind(0,name)>=0 && (ENUM_OBJECT)ObjectGetInteger(0,name,OBJPROP_TYPE)!=OBJ_LABEL)ObjectDelete(0,name);
    if(ObjectFind(0,name)<0 && !ObjectCreate(0,name,OBJ_LABEL,0,0,0))return;
+   TP_ApplyBasketVisibility(name);
    ObjectSetString(0,name,OBJPROP_TOOLTIP,TP_LabelHelp(name,text));
 
    ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
@@ -1437,6 +1442,7 @@ void CreateButton(
    // Preserve the same object while the mouse is pressed or a chart event is queued.
    if(ObjectFind(0,name)>=0 && (ENUM_OBJECT)ObjectGetInteger(0,name,OBJPROP_TYPE)!=OBJ_BUTTON)ObjectDelete(0,name);
    if(ObjectFind(0,name)<0 && !ObjectCreate(0,name,OBJ_BUTTON,0,0,0))return;
+   TP_ApplyBasketVisibility(name);
 
    ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
    ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);

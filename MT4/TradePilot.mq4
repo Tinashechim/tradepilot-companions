@@ -1341,7 +1341,9 @@ void CalculatePanelScale()
 // ============================================================
 
 bool tp_main_open=false,tp_basket_open=false;
+bool tp_panel_build=false;
 void TP_ApplyBasketVisibility(string name);
+bool TP_IsBasketObject(string key);
 
 void CreateRectangle(
    string name,
@@ -1372,6 +1374,7 @@ void CreateRectangle(
    ObjectSetInteger(0, name, OBJPROP_ZORDER, 0);
 }
 
+#include "TradePilotRenderBatch.mqh"
 #include "TradePilotLabelHelp.mqh"
 
 void CreateLabel(
@@ -1383,6 +1386,9 @@ void CreateLabel(
    color text_color
 )
 {
+   // Keep basket labels in their final column during data-only refreshes.
+   if(!tp_panel_build && TP_IsBasketObject(name) && ObjectFind(0,name)>=0){x=(int)ObjectGetInteger(0,name,OBJPROP_XDISTANCE);y=(int)ObjectGetInteger(0,name,OBJPROP_YDISTANCE);}
+
    if(name=="TradePilot_TITLE" || name=="TradePilot_SUBTITLE" || name=="TradePilot_DESCRIPTION") {
       int row=name=="TradePilot_TITLE" ? 2 : name=="TradePilot_SUBTITLE" ? 16 : 28;
       y=PanelY()+S(row);
@@ -1469,9 +1475,11 @@ void CreateEdit(
    int height
 )
 {
-   ObjectDelete(0, name);
+   bool edit_exists=ObjectFind(0,name)>=0;
+   if(edit_exists && (ENUM_OBJECT)ObjectGetInteger(0,name,OBJPROP_TYPE)!=OBJ_EDIT){ObjectDelete(0,name);edit_exists=false;}
+   if(edit_exists)text=ObjectGetString(0,name,OBJPROP_TEXT);
 
-   if(!ObjectCreate(
+   if(!edit_exists && !ObjectCreate(
       0,
       name,
       OBJ_EDIT,
@@ -1736,6 +1744,7 @@ void DeletePanelObjects()
 
 void CreatePanel()
 {
+   tp_panel_build=true;
    // Remove scrollbar objects left behind by any older EA build.
    ObjectDelete(0, "TradePilot_SCROLL_TRACK");
    ObjectDelete(0, "TradePilot_SCROLL_THUMB");
@@ -2052,6 +2061,7 @@ void CreatePanel()
       CreateStopLossLine();
 
 
+   tp_panel_build=false;
 }
 
 void SyncStopLossLineWithoutSpread()
@@ -2113,6 +2123,7 @@ void RebuildResponsivePanel()
       daily_text = ObjectGetString(0, "TradePilot_DAILY_TARGET_EDIT", OBJPROP_TEXT);
 
    CreatePanel();
+   ObjectSetString(0,"TradePilot_SCALE_VALUE",OBJPROP_TEXT,DoubleToString(manual_panel_scale*100.0,1)+"%");
 
    if(risk_text != "")
       ObjectSetString(0, "TradePilot_RISK_EDIT", OBJPROP_TEXT, risk_text);
@@ -2177,6 +2188,7 @@ void UpdatePanelBackground(double closed_pl, double target_money)
 
 void UpdatePanel()
 {
+   TPR_Begin();
    TP_DailyChoiceRender();
    TP_BasketColumnLayout();
 
@@ -2308,6 +2320,7 @@ void UpdatePanel()
    TPC_Render();TPDC_Render();
    TP_BasketColumnLayout();
    TP_PanelVisibility();
+   TPR_End();
    ChartRedraw();
 }
 
@@ -2942,7 +2955,7 @@ void TPM_Render()
    tpm_scale = panel_scale;
    long width = ChartGetInteger(0, CHART_WIDTH_IN_PIXELS);
    if(width > TPM_X()+12) tpm_scale = MathMin(tpm_scale, (double)(width-TPM_X()-12)/304.0);
-   TPM_Widget("BG", OBJ_RECTANGLE_LABEL, 0, 0, 304, tpm_on ? 346 : 31, "", clrSlateGray, C'24,29,39');
+   TPM_Widget("BG", OBJ_RECTANGLE_LABEL, 0, 0, 304, tpm_on ? ((tpm_prices[1]<tpm_prices[0] && tpm_prices[2]>tpm_prices[0]) || (tpm_prices[1]>tpm_prices[0] && tpm_prices[2]<tpm_prices[0]) ? 326 : 346) : 31, "", clrSlateGray, C'24,29,39');
    TPM_Widget("TITLE", OBJ_LABEL, 12, 8, 0, 0, "POINT MEASURER", C'90,180,255', clrNONE, 10);
    if(tpm_on)TPM_Widget("SUBTITLE",OBJ_LABEL,12,27,0,0,"Measurement only",clrWhite,clrNONE);
    else ObjectDelete(0,"TPM_SUBTITLE");

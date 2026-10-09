@@ -79,7 +79,11 @@ bool TP_PanelToggle(string name)
  else if(name=="TPUI_BASKET_TOGGLE")tp_basket_open=!tp_basket_open;
  else return false;
  ObjectSetInteger(0,name,OBJPROP_STATE,false);
- string headers[]={"TPUI_MAIN_COLLAPSED","TPUI_MAIN_CAPTION","TPUI_BASKET_COLLAPSED","TPUI_BASKET_CAPTION","TPUI_MAIN_TOGGLE","TPUI_BASKET_TOGGLE"};
+ bool basket_toggle=(name=="TPUI_BASKET_TOGGLE");
+ string headers[3];
+ headers[0]=basket_toggle?"TPUI_BASKET_COLLAPSED":"TPUI_MAIN_COLLAPSED";
+ headers[1]=basket_toggle?"TPUI_BASKET_CAPTION":"TPUI_MAIN_CAPTION";
+ headers[2]=name;
  for(int i=0;i<ArraySize(headers);i++)ObjectDelete(0,headers[i]);
  // Recreate screen objects in background-before-controls order. A timeframe
  // mask alone can leave previously hidden controls blank after expansion.
@@ -91,6 +95,7 @@ bool TP_PanelToggle(string name)
   if(StringFind(key,"TradePilot_")!=0 || StringFind(key,"CONFIRM")>=0)continue;
   long type=ObjectGetInteger(0,key,OBJPROP_TYPE);
   if(type==OBJ_HLINE||type==OBJ_VLINE||type==OBJ_TREND)continue;
+  if(TP_IsBasketObject(key)!=basket_toggle)continue;
   if(type==OBJ_EDIT) {
    ArrayResize(edits,count+1);ArrayResize(values,count+1);
    edits[count]=key;values[count]=ObjectGetString(0,key,OBJPROP_TEXT);count++;

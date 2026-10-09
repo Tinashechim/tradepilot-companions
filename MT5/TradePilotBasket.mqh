@@ -241,10 +241,10 @@ void TP_BasketProgressRows(datetime period)
  ObjectSetString(0,"TradePilot_PROFIT_VALUE",OBJPROP_TOOLTIP,explanation);
  // Four outline edges keep the total readable without covering its labels.
  int total_x=PanelX()+PanelWidth()+S(20),total_y=PanelY()+S(257),total_w=S(288),total_h=S(29);
- CreateRectangle("TradePilot_TOTAL_TOP",total_x,total_y,total_w,1,C'110,125,145',C'110,125,145');
- CreateRectangle("TradePilot_TOTAL_BOTTOM",total_x,total_y+total_h,total_w,1,C'110,125,145',C'110,125,145');
- CreateRectangle("TradePilot_TOTAL_LEFT",total_x,total_y,1,total_h,C'110,125,145',C'110,125,145');
- CreateRectangle("TradePilot_TOTAL_RIGHT",total_x+total_w,total_y,1,total_h,C'110,125,145',C'110,125,145');
+ CreateRectangle("TradePilot_TOTAL_TOP",total_x,total_y,total_w,2,C'110,125,145',C'110,125,145');
+ CreateRectangle("TradePilot_TOTAL_BOTTOM",total_x,total_y+total_h,total_w,2,C'110,125,145',C'110,125,145');
+ CreateRectangle("TradePilot_TOTAL_LEFT",total_x,total_y,2,total_h,C'110,125,145',C'110,125,145');
+ CreateRectangle("TradePilot_TOTAL_RIGHT",total_x+total_w,total_y,2,total_h,C'110,125,145',C'110,125,145');
  ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_LABEL",OBJPROP_YDISTANCE,PanelY()+S(264));ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_VALUE",OBJPROP_YDISTANCE,PanelY()+S(264));
  string names[]={"PROFIT_LABEL","PROFIT_VALUE","TP_VALUE_LABEL","TARGET_VALUE","TARGET_OTHER1","TARGET_OTHER2","STATUS_LABEL","STATUS_VALUE","BASKET_COSTS","BASKET_SWAP","BASKET_SPREAD","BASKET_GROSS"};
  int positions[]={225,225,302,302,305,326,324,324,84,106,128,424};
@@ -281,8 +281,6 @@ void TP_BasketProgressRows(datetime period)
  CreateRectangle("TradePilot_FLOAT_RIGHT",total_x+total_w,floating_y,1,S(28),C'65,75,90',C'65,75,90');
  string obsolete[]={"BASKET_ESTIMATE_LABEL","BASKET_ESTIMATE_VALUE","BASKET_GROSS","BASKET_GROSS_LABEL"};
  for(int i=0;i<ArraySize(obsolete);i++)if(ObjectFind(0,"TradePilot_"+obsolete[i])>=0)ObjectDelete(0,"TradePilot_"+obsolete[i]);
- ObjectSetInteger(0,"TradePilot_TOTAL_TOP",OBJPROP_YSIZE,2);ObjectSetInteger(0,"TradePilot_TOTAL_BOTTOM",OBJPROP_YSIZE,2);
- ObjectSetInteger(0,"TradePilot_TOTAL_LEFT",OBJPROP_XSIZE,2);ObjectSetInteger(0,"TradePilot_TOTAL_RIGHT",OBJPROP_XSIZE,2);
  // Keep every row on the same label edge, including the legacy Positions/Floating rows.
  string left_labels[]={"POSITIONS_LABEL","PROFIT_LABEL","TP_VALUE_LABEL","STATUS_LABEL","BASKET_TRADES_LABEL","BASKET_ESTIMATE_LABEL","BASKET_TOTAL_LABEL","BASKET_COSTS_LABEL","BASKET_SWAP_LABEL","BASKET_SPREAD_LABEL","BASKET_GROSS_LABEL","BASKET_WINS_LABEL","BASKET_LOSSES_LABEL","BASKET_TRADE_COUNT_LABEL"};
  for(int i=0;i<ArraySize(left_labels);i++) {

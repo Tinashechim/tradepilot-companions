@@ -307,7 +307,7 @@ Update follows the same spacing as the labels above it. The empty section gap be
 
 
 DESKTOP ACCESS AND CURRENT LEADS
-Current Lead appears below TradePilot branding and above the account totals; multiple active strategies are listed as Current Leads. Settings > Lock after inactivity accepts a whole number of minutes. Example: 10 locks after ten minutes without activity; 0 disables automatic locking. The local sign-in screen has a Minimize button. Minimizing does not unlock the admin screen or stop connections. Return to the sign-in window and unlock with your local password.
+Current Lead appears below TradePilot branding and above the account totals; multiple lead accounts are listed as Current Leads. This heading shows account names and numbers; strategy names remain in their account sections. Settings > Lock after inactivity accepts a whole number of minutes. Example: 10 locks after ten minutes without activity; 0 disables automatic locking. The local sign-in screen has Cancel and Unlock buttons. Cancel opens the close warning; canceling that warning keeps TradePilot locked and running. Confirming closure stops local connections, schedules and delivery without closing broker orders.
 
 
 DAILY UPDATE CONFIRMATIONS
@@ -324,3 +324,14 @@ Daily Performance and Daily Loss Limit each have their own Apply wins and Apply 
 Press Enter after editing Daily target or Loss limit to open exactly the same review as that section's Update button. Nothing is saved until Yes is selected. Daily Performance no longer repeats Budget left; Closed P/L and Remaining target sit directly above its Apply controls.
 
 Panel display switches are independent: opening the main panel must leave Current Basket collapsed when its own switch is OFF. Display switches do not enable trading or copying.
+
+
+Notifications use the desktop theme with consistent headings, readable scrollable messages and confirmation buttons. Closing a confirmation cancels it. Local sign-in shows By Tinashe Chimanikire at bottom left and the installed version at bottom right.
+
+The Accounts action buttons rearrange into rows when the desktop window is resized. Add account remains visible; use the account list scrollbars for additional rows and columns.
+
+
+Zoom minus and plus update the displayed percentage immediately. Resizing retains entered draft values. Sign-in Cancel and the title-bar X open the close warning; declining leaves the app running and locked. Locking clears Windows taskbar attention flashing without disabling Activity records or notification emails.
+
+PANEL DISPLAY UPDATE (1.0.32)
+The main panel and Current Basket have independent switches. Switching a panel changes its display only; it does not change trading permissions. Total P/L uses a thicker border than Floating P/L. Keep trading off while checking display changes.

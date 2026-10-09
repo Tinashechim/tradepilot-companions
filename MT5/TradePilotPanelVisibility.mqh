@@ -12,7 +12,12 @@ void TP_PanelVisibility()
   if(key=="TPUI_MAIN_TOGGLE"||key=="TPUI_BASKET_TOGGLE"||key=="TPUI_MAIN_COLLAPSED"||key=="TPUI_MAIN_CAPTION"||key=="TPUI_BASKET_COLLAPSED"||key=="TPUI_BASKET_CAPTION")continue;
   if(key=="TradePilot_TARGET_UNIT"||key=="TradePilot_CARRY_CURRENCY"||key=="TradePilot_REMAINING_UNIT") {ObjectSetInteger(0,key,OBJPROP_TIMEFRAMES,OBJ_NO_PERIODS);continue;}
   long x=ObjectGetInteger(0,key,OBJPROP_XDISTANCE);
-  bool open=x>=basket_x?tp_basket_open:tp_main_open;
+  // Basket ownership is fixed by object identity, not transient coordinates
+  // while a resize/update rebuilds labels at their original main-column positions.
+  string suffix=StringSubstr(key,StringLen("TradePilot_"));
+  string basket_names="|CURRENT_BORDER|BASKET_TITLE|POSITIONS_LABEL|POSITIONS_VALUE|PROFIT_LABEL|PROFIT_VALUE|TP_VALUE_LABEL|TARGET_VALUE|TARGET_UNIT|STATUS_LABEL|STATUS_VALUE|";
+  bool basket=StringFind(basket_names,"|"+suffix+"|")>=0 || StringFind(suffix,"CARRY_")==0 || StringFind(suffix,"BASKET_")==0 || StringFind(suffix,"FLOAT_")==0 || suffix=="FLOATING_EQUIVALENTS" || StringFind(suffix,"TOTAL_")==0;
+  bool open=basket?tp_basket_open:tp_main_open;
   long desired=open?OBJ_ALL_PERIODS:OBJ_NO_PERIODS;
   if(ObjectGetInteger(0,key,OBJPROP_TIMEFRAMES)!=desired)ObjectSetInteger(0,key,OBJPROP_TIMEFRAMES,desired);
  }
@@ -88,3 +93,4 @@ bool TP_PanelToggle(string name)
  UpdatePanel();ChartRedraw();return true;
 }
 #endif
+

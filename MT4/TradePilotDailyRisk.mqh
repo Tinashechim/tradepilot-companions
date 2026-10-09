@@ -243,13 +243,9 @@ bool TPDL_Event(string name)
   string ratio=risk>0?DoubleToString(amount/risk,2)+"R":"Ratio pending";
   string equivalents=tpdl_edit_percent?percentage+" ("+cash+"; "+ratio+")":cash+" ("+percentage+"; "+ratio+")";
   string change=MathAbs(delta)<0.00000001?"Daily loss limit unchanged":(delta>0?"Increase by ":"Decrease by ")+equivalents;
-  string review=change+"\nApply wins: "+(tp_daily_wins?"ON":"OFF")+"\nApply losses: "+(tp_daily_losses?"ON":"OFF")+(proposed_value==0?"\nNo daily loss limit will be active.":"")+"\n\nContinue?";
-  if(MessageBox(review,"Update Daily Loss Limit",MB_YESNO|MB_ICONQUESTION)!=IDYES)return true;
-  if(!TPDL_SavePending())return true;
-  datetime period=GetSessionStartForTime(TPDL_Now());
-  GlobalVariableSet(SessionKey(period,"APPLY_WINS"),tp_daily_wins?1:0);
-  GlobalVariableSet(SessionKey(period,"APPLY_LOSSES"),tp_daily_losses?1:0);
-  UpdatePanel();return true;
+  TPC_Close();tpdc_loss=true;tpdc_loss_change=change;tpdc_loss_unlimited=proposed_value==0;
+  tpdc_open=true;tpdc_period=preview_period;tpdc_signature=TPDC_InputSignature();
+  TPDC_Render();ChartRedraw();return true;
  }
  if(name!="TradePilot_LIMIT_MODE")return false;
  tpdl_edit_percent=!tpdl_edit_percent;ObjectSetInteger(0,name,OBJPROP_STATE,false);UpdatePanel();return true;

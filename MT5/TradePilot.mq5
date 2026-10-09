@@ -879,6 +879,7 @@ bool ReadDailyTarget()
    );
 
 
+   GlobalVariableSet(SessionKey(current_session,"MODE"),(double)GetDailyTargetMode());
    TPDR_Save(current_session);
    return true;
 }
@@ -1315,7 +1316,7 @@ void UpdateStopLossLineButton()
          0,
          "TradePilot_SL_LINE_BUTTON",
          OBJPROP_BGCOLOR,
-         C'45,105,75'
+         C'35,115,80'
       );
    }
    else
@@ -1332,7 +1333,7 @@ void UpdateStopLossLineButton()
          0,
          "TradePilot_SL_LINE_BUTTON",
          OBJPROP_BGCOLOR,
-         C'90,55,55'
+         C'140,45,45'
       );
    }
 }
@@ -1397,7 +1398,7 @@ void TP_SpreadStop(bool new_base)
    ObjectSetString(0,"TradePilot_SL_EDIT",OBJPROP_TEXT,DoubleToString(effective,(int)SymbolInfoInteger(Symbol(),SYMBOL_DIGITS)));
    if(ObjectFind(0,"TradePilot_SL_LINE")>=0) ObjectSetDouble(0,"TradePilot_SL_LINE",OBJPROP_PRICE,effective);
    ObjectSetString(0,"TradePilot_SPREAD_TOGGLE",OBJPROP_TEXT,tp_spread_on?"SPREAD ON":"SPREAD OFF");
-   ObjectSetInteger(0,"TradePilot_SPREAD_TOGGLE",OBJPROP_BGCOLOR,tp_spread_on?C'45,115,75':C'110,55,55');
+   ObjectSetInteger(0,"TradePilot_SPREAD_TOGGLE",OBJPROP_BGCOLOR,tp_spread_on?C'35,115,80':C'140,45,45');
    CalculatePositionSize();ChartRedraw();
 }
 
@@ -2235,7 +2236,7 @@ void CreateLabel(
    );
 
 
-   ObjectSetInteger(0,name,OBJPROP_TIMEFRAMES,text=="" ? OBJ_NO_PERIODS : OBJ_ALL_PERIODS);
+   if(text=="")ObjectSetInteger(0,name,OBJPROP_TIMEFRAMES,OBJ_NO_PERIODS);
    ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
    ObjectSetInteger(0, name, OBJPROP_SELECTED, false);
    ObjectSetInteger(0, name, OBJPROP_BACK, false);
@@ -2560,17 +2561,8 @@ void CreatePanel()
 
    // Manual panel scaling. Automatic monitor/chart fitting remains active,
    // while these controls let the user fine-tune the result.
-   CreateButton("TradePilot_SCALE_MINUS", "-",
-                px + S(184), py + S(21), S(24), S(20), C'55,60,70');
+   // Zoom controls are created after panel backgrounds by TP_PanelVisibility.
 
-   CreateEdit("TradePilot_SCALE_VALUE",DoubleToString(manual_panel_scale*100.0,1)+"%",px+S(211),py+S(21),S(44));
-   ObjectSetInteger(0,"TradePilot_SCALE_VALUE",OBJPROP_YSIZE,S(20));
-   ObjectSetInteger(0,"TradePilot_SCALE_VALUE",OBJPROP_ALIGN,ALIGN_CENTER);
-   ObjectSetInteger(0,"TradePilot_SCALE_VALUE",OBJPROP_FONTSIZE,FontSize(BASE_FONT_SMALL));
-   ObjectSetString(0,"TradePilot_SCALE_VALUE",OBJPROP_TOOLTIP,"Type your preferred zoom from 50% to 150%, then press Enter or click outside to apply. Minus and plus adjust it one percentage point at a time. Chart fitting may reduce the displayed panel size on small windows.");
-
-   CreateButton("TradePilot_SCALE_PLUS", "+",
-                px + S(258), py + S(21), S(24), S(20), C'55,60,70');
 
    CreateRectangle("TradePilot_BASKET_COLUMN_BG",PanelX()+PanelWidth()+S(12),PanelY(),S(304),S(322),C'25,28,35',C'70,75,85');
    // Create the Carry-over background before its labels so it cannot cover them.
@@ -2657,89 +2649,72 @@ void CreatePanel()
    CreateValue("TradePilot_DAILY_STATUS_VALUE", "IN PROGRESS", py + S(346), C'255,190,80');
 
    // POSITION SIZER
-   CreateRectangle("TradePilot_SIZER_DIVIDER", LabelX(), py + S(400), pw - S(22), 1,
+   CreateRectangle("TradePilot_SIZER_DIVIDER", LabelX(), py + S(380), pw - S(22), 1,
                    C'65,70,80', C'65,70,80');
    CreateLabel("TradePilot_SIZER_TITLE", "POSITION SIZER",
-               LabelX(), py + S(410), FontSize(BASE_FONT_SECTION), C'90,180,255');
+               LabelX(), py + S(390), FontSize(BASE_FONT_SECTION), C'90,180,255');
 
    CreateLabel("TradePilot_SYMBOL_LABEL", "Symbol",
-               LabelX(), py + S(432), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_SYMBOL_VALUE", _Symbol, py + S(432), clrWhite);
+               LabelX(), py + S(412), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_SYMBOL_VALUE", _Symbol, py + S(412), clrWhite);
 
    CreateLabel("TradePilot_SPREAD_LABEL", "Spread",
-               LabelX(), py + S(451), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_SPREAD_VALUE", "0.0", py + S(451), clrWhite);
+               LabelX(), py + S(431), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_SPREAD_VALUE", "0.0", py + S(431), clrWhite);
    CreateLabel("TradePilot_SPREAD_UNIT", "points",
-               UnitX(), py + S(452), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(432), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_RISK_MODE_LABEL", "Risk Mode",
-               LabelX(), py + S(475), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+               LabelX(), py + S(455), FontSize(BASE_FONT_NORMAL), C'190,195,205');
    CreateButton("TradePilot_RISK_MODE_BUTTON", "Percentage",
-                ValueX(), py + S(469), S(88), S(19), C'55,60,70');
+                ValueX(), py + S(449), S(88), S(19), C'55,60,70');
 
    CreateLabel("TradePilot_RISK_LABEL", "Risk",
-               LabelX(), py + S(499), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateEdit("TradePilot_RISK_EDIT", "1.00", ValueX(), py + S(493), S(72));
+               LabelX(), py + S(479), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateEdit("TradePilot_RISK_EDIT", "1.00", ValueX(), py + S(473), S(72));
    CreateLabel("TradePilot_RISK_UNIT", "%",
-               UnitX(), py + S(500), FontSize(BASE_FONT_SMALL), clrWhite);
+               UnitX(), py + S(480), FontSize(BASE_FONT_SMALL), clrWhite);
 
    CreateLabel("TradePilot_ENTRY_LABEL", "Entry Price",
-               LabelX(), py + S(523), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+               LabelX(), py + S(503), FontSize(BASE_FONT_NORMAL), C'190,195,205');
    CreateEdit("TradePilot_ENTRY_EDIT", DoubleToString(current_price, digits),
-              ValueX(), py + S(517), S(88));
+              ValueX(), py + S(497), S(88));
 
    CreateLabel("TradePilot_SL_LABEL", "Stop Loss",
-               LabelX(), py + S(547), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateEdit("TradePilot_SL_EDIT", "", ValueX(), py + S(541), S(88));
+               LabelX(), py + S(527), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateEdit("TradePilot_SL_EDIT", "", ValueX(), py + S(521), S(88));
 
-   CreateButton("TradePilot_SPREAD_TOGGLE",tp_spread_on?"SPREAD ON":"SPREAD OFF",LabelX(),py + S(565),S(130),S(19),tp_spread_on?C'45,115,75':C'110,55,55');
+   CreateButton("TradePilot_SPREAD_TOGGLE",tp_spread_on?"SPREAD ON":"SPREAD OFF",LabelX(),py + S(545),S(130),S(19),tp_spread_on?C'35,115,80':C'140,45,45');
    ObjectSetString(0,"TradePilot_SPREAD_TOGGLE",OBJPROP_TOOLTIP,"ON moves the planned stop one current spread farther from entry and recalculates size. OFF restores the unadjusted stop. Starts OFF. It does not change stops on existing trades.");
    CreateButton("TradePilot_SL_LINE_BUTTON", sl_line_enabled ? "SL LINE ON" : "SL LINE OFF",
-                ValueX(), py + S(565), S(124), S(19), sl_line_enabled ? C'45,105,75' : C'110,55,55');
+                ValueX(), py + S(545), S(124), S(19), sl_line_enabled ? C'35,115,80' : C'140,45,45');
 
    CreateLabel("TradePilot_SIZE_LABEL", "Calculated Size",
-               LabelX(), py + S(590), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_SIZE_VALUE", "Not calculated", py + S(590), C'255,190,80');
+               LabelX(), py + S(566), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_SIZE_VALUE", "Not calculated", py + S(566), C'255,190,80');
    CreateLabel("TradePilot_SIZE_UNIT", "lots",
-               UnitX(), py + S(591), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(567), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_BROKER_MAX_LABEL", "Broker Max",
-               LabelX(), py + S(609), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+               LabelX(), py + S(588), FontSize(BASE_FONT_NORMAL), C'190,195,205');
    CreateValue("TradePilot_BROKER_MAX_VALUE",
                DoubleToString(SymbolInfoDouble(_Symbol, SYMBOL_VOLUME_MAX), 2),
-               py + S(609), clrWhite);
+               py + S(588), clrWhite);
    CreateLabel("TradePilot_BROKER_MAX_UNIT", "lots",
-               UnitX(), py + S(610), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(588), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
    CreateLabel("TradePilot_MARGIN_LABEL", "Required Margin",
-               LabelX(), py + S(634), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_MARGIN_VALUE", "Not verified", py + S(634), clrWhite);
+               LabelX(), py + S(610), FontSize(BASE_FONT_NORMAL), C'190,195,205');
+   CreateValue("TradePilot_MARGIN_VALUE", "Not verified", py + S(610), clrWhite);
    CreateLabel("TradePilot_MARGIN_UNIT", account_currency,
-               UnitX(), py + S(635), FontSize(BASE_FONT_SMALL), C'160,165,175');
+               UnitX(), py + S(611), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
 
-   CreateButton("TradePilot_CALCULATE_BUTTON", "CALCULATE",
-                LabelX(), py + S(658), pw - S(22), S(21), C'45,105,155');
+   CreateButton("TradePilot_CALCULATE_BUTTON","CALCULATE",LabelX(),py+S(626),pw-S(22),S(21),C'45,105,155');
 
-   CreateButton(
-      "TradePilot_BUY_BUTTON",
-      "BUY",
-      LabelX(),
-      py + S(684),
-      S(132),
-      S(22),
-      C'45,115,75'
-   );
+   CreateButton("TradePilot_BUY_BUTTON","BUY",LabelX(),py+S(652),pw-S(22),S(21),C'35,115,80');
 
-   CreateButton(
-      "TradePilot_SELL_BUTTON",
-      "SELL",
-      LabelX() + S(138),
-      py + S(684),
-      S(132),
-      S(22),
-      C'120,60,60'
-   );
+   CreateButton("TradePilot_SELL_BUTTON","SELL",LabelX(),py+S(678),pw-S(22),S(21),C'140,45,45');
 
    ObjectDelete(0,"TradePilot_SIGNATURE");
 
@@ -2849,8 +2824,10 @@ void RebuildResponsivePanel()
 
 
    TP_DailyEquivalent();
+   TPDL_ClosedSummary();
    TPDL_FinalStatus();
    TPC_Render();TPDC_Render();
+   TP_PanelVisibility();
    ChartRedraw();
 }
 
@@ -3202,8 +3179,10 @@ void UpdatePanel()
 
 
    TP_DailyEquivalent();
+   TPDL_ClosedSummary();
    TPDL_FinalStatus();
    TPC_Render();TPDC_Render();
+   TP_PanelVisibility();
    ChartRedraw();
 }
 
@@ -3219,6 +3198,7 @@ void OnChartEvent(
    const string &sparam
 )
 {
+ if(id==CHARTEVENT_OBJECT_CLICK && TP_PanelToggle(sparam))return;
  if(id==CHARTEVENT_OBJECT_ENDEDIT && sparam=="TradePilot_SCALE_VALUE") {
   if(tp_spread_confirm_open||tpc_open||tpdc_open){ObjectSetString(0,sparam,OBJPROP_TEXT,DoubleToString(manual_panel_scale*100.0,1)+"%");return;}
   string text=ObjectGetString(0,sparam,OBJPROP_TEXT);StringTrimLeft(text);StringTrimRight(text);
@@ -3547,6 +3527,7 @@ void OnChartEvent(
 
 void DeletePanel()
 {
+   ObjectsDeleteAll(0,"TPUI_");
    ObjectsDeleteAll(
       0,
       "TradePilot_"
@@ -3913,17 +3894,17 @@ void TP_DailyChoiceClose()
 void TP_DailyChoiceRender()
 {
  if(tp_daily_choice_session!=GetDailySessionStart()) {tp_daily_choice_session=GetDailySessionStart();tp_daily_wins=TP_DailyInclude(tp_daily_choice_session,1);tp_daily_losses=TP_DailyInclude(tp_daily_choice_session,-1);}
- int x=LabelX(),y=PanelY()+S(170);
+ int x=LabelX(),y=PanelY()+S(322);
  CreateButton("TradePilot_DAILY_CHOICE_WINS",(tp_daily_wins ? "[X]" : "[ ]")+" Apply wins",x,y,S(130),S(20),tp_daily_wins?C'35,115,80':C'140,45,45');
  CreateButton("TradePilot_DAILY_CHOICE_LOSSES",(tp_daily_losses ? "[X]" : "[ ]")+" Apply losses",ValueX(),y,S(130),S(20),tp_daily_losses?C'35,115,80':C'140,45,45');
- CreateButton("TradePilot_DAILY_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,PanelY()+S(365),S(88),S(19),C'55,60,70');
- ObjectSetString(0,"TradePilot_DAILY_UPDATE",OBJPROP_TOOLTIP,"Click to save Daily Performance: target, Apply wins, Apply losses and daily loss protection. Red/green applies to ON/OFF switches; Update is a save action. Invalid input leaves settings unchanged.");
+ CreateButton("TradePilot_DAILY_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,PanelY()+S(140),S(88),S(19),C'55,60,70');
+ ObjectSetString(0,"TradePilot_DAILY_UPDATE",OBJPROP_TOOLTIP,"Click to save Daily Performance: target, Apply wins and Apply losses. Daily Loss Limit has its own Update. Red/green applies to ON/OFF switches; Update is a save action. Invalid input leaves settings unchanged.");
  ObjectSetString(0,"TradePilot_DAILY_CHOICE_WINS",OBJPROP_TOOLTIP,"Default OFF. Turn ON to count this daily basket's positive net results, including open profits, toward its target. Press Update to save for this period. Reports always retain actual results.");
  ObjectSetString(0,"TradePilot_DAILY_CHOICE_LOSSES",OBJPROP_TOOLTIP,"Default OFF. Turn ON to include this daily basket's negative net results, including open losses, so losses increase the amount needed to reach its target. Press Update to save. Daily loss protection always counts all results.");
 
 }
 string TPDC_InputSignature()
-{return ObjectGetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT)+"|"+(TPDR_Enabled()?"Ratio":ObjectGetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TEXT))+"|"+ObjectGetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TEXT)+"|"+(tpdl_edit_percent?"1":"0")+"|"+(tp_daily_wins?"1":"0")+"|"+(tp_daily_losses?"1":"0");}
+{return ObjectGetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT)+"|"+(TPDR_Enabled()?"Ratio":ObjectGetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TEXT))+"|"+(tp_daily_wins?"1":"0")+"|"+(tp_daily_losses?"1":"0")+"|"+ObjectGetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TEXT)+"|"+(tpdl_edit_percent?"1":"0");}
 void TPDC_Close(){tpdc_open=false;ObjectsDeleteAll(0,"TradePilot_DAILY_CONFIRM_");}
 void TPDC_Render()
 {
@@ -3933,8 +3914,18 @@ void TPDC_Render()
  CreateLabel("TradePilot_DAILY_CONFIRM_TITLE","Confirm Daily Performance",x+S(12),y+S(12),FontSize(BASE_FONT_NORMAL),clrWhite);
  CreateLabel("TradePilot_DAILY_CONFIRM_WINS","Apply wins: "+(tp_daily_wins?"ON":"OFF"),x+S(12),y+S(38),FontSize(BASE_FONT_NORMAL),clrWhite);
  CreateLabel("TradePilot_DAILY_CONFIRM_LOSSES","Apply losses: "+(tp_daily_losses?"ON":"OFF"),x+S(12),y+S(58),FontSize(BASE_FONT_NORMAL),clrWhite);
- string limit=ObjectGetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TEXT);StringTrimLeft(limit);StringTrimRight(limit);
- CreateLabel("TradePilot_DAILY_CONFIRM_REMOVE",TPDL_Limit()>0&&limit==""?"Remove daily loss limit?":"",x+S(12),y+S(78),FontSize(BASE_FONT_NORMAL),clrWhite);
+
+ double entered=TPDR_Parse(ObjectGetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT));
+ double proposed=TPDR_Enabled()?entered*TPDR_RiskCash():(GlobalVariableGet(GV_DAILY_MODE)>0.5?GetSessionStartBalance(tpdc_period)*entered/100:entered);
+ double delta=proposed-GetSessionTargetMoney(tpdc_period);
+ double amount=MathAbs(delta),balance=GetSessionStartBalance(tpdc_period),risk=TPDR_RiskCash();
+ string cash=AccountInfoString(ACCOUNT_CURRENCY)+" "+DoubleToString(amount,2);
+ string percentage=balance>0?DoubleToString(amount/balance*100,2)+"%":"Percentage pending";
+ string ratio=risk>0?DoubleToString(amount/risk,2)+"R":"Ratio pending";
+ string modes=TPDR_Enabled()?ratio+" ("+cash+"; "+percentage+")":GlobalVariableGet(GV_DAILY_MODE)>0.5?percentage+" ("+cash+"; "+ratio+")":cash+" ("+percentage+"; "+ratio+")";
+ string change=MathAbs(delta)<0.00000001?"Daily target unchanged":(delta>0?"Increase by ":"Decrease by ")+modes;
+
+ CreateLabel("TradePilot_DAILY_CONFIRM_CHANGE",change,x+S(12),y+S(78),TP_HeaderFont(change,FontSize(BASE_FONT_NORMAL),S(252),S(16)),clrWhite);
  CreateLabel("TradePilot_DAILY_CONFIRM_CONTINUE","Continue?",x+S(12),y+S(98),FontSize(BASE_FONT_NORMAL),clrWhite);
  CreateButton("TradePilot_DAILY_CONFIRM_YES","Yes",x+S(12),y+S(126),S(90),S(22),C'55,60,70');
  CreateButton("TradePilot_DAILY_CONFIRM_NO","No",x+S(150),y+S(126),S(90),S(22),C'55,60,70');
@@ -3951,7 +3942,6 @@ bool TP_DailyChoiceEvent(string name)
   if(tpdc_period!=GetDailySessionStart()||tpdc_signature!=TPDC_InputSignature()){TPDC_Close();Alert("Daily settings changed. Review them and press Update again.");UpdatePanel();return true;}
   double pending_target=TPDR_Parse(ObjectGetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT));
   if(!MathIsValidNumber(pending_target)||pending_target<=0){TPDC_Close();return true;}
-  if(!TPDL_SavePending(true))return true;
   if(!ReadDailyTarget())return true;
   GlobalVariableSet(SessionKey(tpdc_period,"APPLY_WINS"),tp_daily_wins?1:0);GlobalVariableSet(SessionKey(tpdc_period,"APPLY_LOSSES"),tp_daily_losses?1:0);
   TPDC_Close();UpdatePanel();return true;
@@ -3982,16 +3972,15 @@ void TP_DailyEquivalent()
  ObjectSetInteger(0,"TradePilot_REMAINING_UNIT",OBJPROP_TIMEFRAMES,OBJ_NO_PERIODS);
  string primary="",second="",third="";
  TPDR_RemainingParts(period,remaining,balance,AccountInfoString(ACCOUNT_CURRENCY),GlobalVariableGet(GV_DAILY_MODE)>0.5,primary,second,third,true);
- string help="Remaining target: the selected mode is next to the heading, with the other equivalent values below. Percentage uses the period's starting balance. Ratio uses planned risk. "+primary+"; "+second+"; "+third;
+ string help="Remaining target: the selected mode is next to the heading, with the other two equivalent values in brackets on the same row. Percentage uses the period's starting balance. Ratio uses planned risk. "+primary+"; "+second+"; "+third;
  ObjectSetString(0,"TradePilot_TARGET_VALUE",OBJPROP_TEXT,primary);
  ObjectSetString(0,"TradePilot_TARGET_VALUE",OBJPROP_TOOLTIP,help);
  ObjectSetInteger(0,"TradePilot_TARGET_UNIT",OBJPROP_TIMEFRAMES,OBJ_NO_PERIODS);
  ObjectSetInteger(0,"TradePilot_TARGET_VALUE",OBJPROP_XDISTANCE,ValueX()+PanelWidth()+S(12));
- ObjectSetInteger(0,"TradePilot_TARGET_VALUE",OBJPROP_YDISTANCE,PanelY()+S(65));
- ObjectSetInteger(0,"TradePilot_TARGET_VALUE",OBJPROP_FONTSIZE,MathMax(4,MathMin(FontSize(BASE_FONT_NORMAL),(int)(S(124)/MathMax(1,StringLen(primary)*0.60)))));
- CreateLabel("TradePilot_TARGET_OTHER1",second,PanelX()+PanelWidth()+S(24),PanelY()+S(83),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateLabel("TradePilot_TARGET_OTHER2",third,PanelX()+PanelWidth()+S(24),PanelY()+S(101),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- ObjectSetString(0,"TradePilot_TARGET_OTHER1",OBJPROP_TOOLTIP,help);ObjectSetString(0,"TradePilot_TARGET_OTHER2",OBJPROP_TOOLTIP,help);
+ ObjectSetInteger(0,"TradePilot_TARGET_VALUE",OBJPROP_YDISTANCE,PanelY()+S(77));
+ ObjectSetInteger(0,"TradePilot_TP_VALUE_LABEL",OBJPROP_YDISTANCE,PanelY()+S(77));
+ ObjectSetInteger(0,"TradePilot_TARGET_VALUE",OBJPROP_FONTSIZE,TP_HeaderFont(primary,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
+ ObjectDelete(0,"TradePilot_TARGET_OTHER1");ObjectDelete(0,"TradePilot_TARGET_OTHER2");
  double closed_net=0,floating_net=0,adjusted_net=0;
  bool closed_ready=TPDL_Totals(closed_net,floating_net,adjusted_net);
  ObjectSetInteger(0,"TradePilot_REMAINING_VALUE",OBJPROP_COLOR,!closed_ready?clrWhite:closed_net>0?C'90,220,140':closed_net<0?C'255,100,100':clrWhite);
@@ -4031,7 +4020,7 @@ void TP_SpreadTradePrompt()
  CreateLabel("TradePilot_SPREAD_CONFIRM_TEXT",text,x,y,TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(278),S(16)),clrWhite);
  ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_TEXT",OBJPROP_TOOLTIP,tp_spread_pending_calculation?"Calculate using your entered stop without extra spread allowance. Continue calculates only; it sends no order. Cancel leaves the calculation unchanged.":"Continue this one trade using the entered stop without extra spread allowance. Quote, stop, risk, margin and trading permissions are checked again. Cancel sends nothing.");
  CreateButton("TradePilot_SPREAD_CONFIRM_CONTINUE","Continue",x,y+S(25),S(130),S(24),C'55,60,70');
- CreateButton("TradePilot_SPREAD_CONFIRM_CANCEL","Cancel",ValueX(),y+S(25),S(130),S(24),C'110,55,55');
+ CreateButton("TradePilot_SPREAD_CONFIRM_CANCEL","Cancel",ValueX(),y+S(25),S(130),S(24),C'140,45,45');
  ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_CONTINUE",OBJPROP_TOOLTIP,tp_spread_pending_calculation?"Calculate with spread allowance OFF. This does not place a trade.":"Continue this one order with spread allowance OFF after normal broker checks.");
  ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_CANCEL",OBJPROP_TOOLTIP,"Cancel this request without sending an order or changing the spread setting.");ChartRedraw();
 }
@@ -4041,3 +4030,5 @@ void TP_CalculateRequested(bool confirmed=false)
  if(!tp_spread_on && !confirmed){tp_spread_pending_calculation=true;tp_spread_confirm_open=true;TP_SpreadTradePrompt();return;}
  CalculatePositionSize();
 }
+
+#include "TradePilotPanelVisibility.mqh"

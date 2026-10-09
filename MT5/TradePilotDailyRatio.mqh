@@ -1,5 +1,16 @@
 #ifndef TRADEPILOT_DAILY_RATIO
 #define TRADEPILOT_DAILY_RATIO
+string TPDR_Inline(string primary,string second,string third)
+{
+ StringReplace(second,"Percentage: ","");StringReplace(second,"Cash: ","");StringReplace(second,"Ratio: ","");
+ StringReplace(third,"Percentage: ","");StringReplace(third,"Cash: ","");StringReplace(third,"Ratio: ","");
+ return primary+" ("+second+"; "+third+")";
+}
+double TPDR_SavedRisk(datetime period)
+{
+ double saved=GlobalVariableGet(SessionKey(period,"RATIO_RISK"));
+ return MathIsValidNumber(saved)&&saved>0?saved:TPDR_RiskCash();
+}
 bool TPDR_Enabled() {return GlobalVariableCheck(GV_DAILY_MODE+"_RATIO") && GlobalVariableGet(GV_DAILY_MODE+"_RATIO")>0;}
 double TPDR_RiskCash() {double risk=GetRiskAmount();return TerminalInfoInteger(TERMINAL_CONNECTED) && MathIsValidNumber(risk) && risk>0 ? risk : 0;}
 double TPDR_Number(string text)
@@ -19,7 +30,7 @@ double TPDR_Parse(string text)
 void TPDR_Save(datetime period)
 {
  GlobalVariableSet(SessionKey(period,"RATIO"),TPDR_Enabled()?1:0);
- if(TPDR_Enabled()) GlobalVariableSet(SessionKey(period,"RATIO_RISK"),TPDR_RiskCash());
+ GlobalVariableSet(SessionKey(period,"RATIO_RISK"),TPDR_RiskCash());
 }
 void TPDR_Init(datetime period)
 {
@@ -80,7 +91,7 @@ bool TPDR_Event(string name)
 
 string TPDR_RemainingDisplay(datetime period,double remaining,double balance,string currency,bool percent)
 {
- double risk=GlobalVariableGet(SessionKey(period,"RATIO"))>0?GlobalVariableGet(SessionKey(period,"RATIO_RISK")):TPDR_RiskCash();
+ double risk=TPDR_SavedRisk(period);
  string cash=currency+" "+DoubleToString(remaining,2);
  string percentage=balance>0?DoubleToString(remaining/balance*100,2)+"%":"Percentage pending";
  string ratio=risk>0?"1:"+DoubleToString(remaining/risk,2):"Ratio pending";
@@ -92,7 +103,7 @@ string TPDR_RemainingDisplay(datetime period,double remaining,double balance,str
 
 void TPDR_RemainingParts(datetime period,double remaining,double balance,string currency,bool percent,string &primary,string &second,string &third,bool preview=false)
 {
- double risk=GlobalVariableGet(SessionKey(period,"RATIO"))>0?GlobalVariableGet(SessionKey(period,"RATIO_RISK")):TPDR_RiskCash();
+ double risk=TPDR_SavedRisk(period);
  string cash=currency+" "+DoubleToString(remaining,2);
  string percentage=balance>0?DoubleToString(remaining/balance*100,2)+"%":"Percentage pending";
  string ratio=MathIsValidNumber(risk)&&risk>0?"1:"+DoubleToString(remaining/risk,2):"Ratio pending";
@@ -106,39 +117,33 @@ void TPDR_TargetEquivalents(datetime period,double target,bool percent,string cu
 {
  string primary="",second="",third="";
  double balance=GetSessionStartBalance(period);
- double risk=GlobalVariableGet(SessionKey(period,"RATIO"))>0 ? GlobalVariableGet(SessionKey(period,"RATIO_RISK")) : TPDR_RiskCash();
+ double risk=TPDR_SavedRisk(period);
  string cash=currency+" "+DoubleToString(target,2),percentage=balance>0?DoubleToString(target/balance*100,2)+"%":"Percentage pending";
  string ratio=risk>0?"1:"+DoubleToString(target/risk,2):"Ratio pending";
  if(TPDR_Enabled()){primary=ratio;second="Percentage: "+percentage;third="Cash: "+cash;}
  else if(GetDailyTargetMode()==DAILY_PERCENTAGE){primary=percentage;second="Cash: "+cash;third="Ratio: "+ratio;}
  else {primary=cash;second="Percentage: "+percentage;third="Ratio: "+ratio;}
- string rows[3];rows[0]="Saved target: "+primary;rows[1]=second;rows[2]=third;
- string keys[3]={"TradePilot_DAILY_EQUIVALENT","TradePilot_DAILY_OTHER1","TradePilot_DAILY_OTHER2"};
- for(int i=0;i<3;i++) {
-  int separator=StringFind(rows[i],": ");
-  string caption=separator>=0?StringSubstr(rows[i],0,separator):"Equivalent";
-  string value=separator>=0?StringSubstr(rows[i],separator+2):rows[i];
-  int row_y=PanelY()+S(115+i*16);
-  CreateLabel(keys[i]+"_LABEL",caption,LabelX(),row_y,FontSize(BASE_FONT_NORMAL),C'190,195,205');
-  int size=TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(14));
-  CreateLabel(keys[i],value,ValueX(),row_y,size,C'190,195,205');
-  ObjectSetInteger(0,keys[i],OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
-  ObjectSetString(0,keys[i],OBJPROP_TOOLTIP,"Your saved daily target shown as money, percentage and risk-to-reward. Press Update to apply a new target or mode. Money uses your account currency. Percentage uses this day's starting balance. Ratio uses the planned risk; a missing risk is shown as pending.");
-  ObjectSetString(0,keys[i]+"_LABEL",OBJPROP_TOOLTIP,ObjectGetString(0,keys[i],OBJPROP_TOOLTIP));
- }
+ StringReplace(second,"Percentage: ","");StringReplace(second,"Cash: ","");StringReplace(second,"Ratio: ","");
+ StringReplace(third,"Percentage: ","");StringReplace(third,"Cash: ","");StringReplace(third,"Ratio: ","");
+ string value=primary+" ("+second+"; "+third+")";
+ CreateLabel("TradePilot_DAILY_EQUIVALENT_LABEL","Saved target",LabelX(),PanelY()+S(115),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateLabel("TradePilot_DAILY_EQUIVALENT",value,ValueX(),PanelY()+S(115),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ ObjectSetString(0,"TradePilot_DAILY_EQUIVALENT",OBJPROP_TOOLTIP,"Saved daily target: selected mode first, then the other two equivalents in brackets. Percentage uses the day's starting balance; ratio uses the saved planned risk. "+value);
+ string obsolete[]={"TradePilot_DAILY_OTHER1","TradePilot_DAILY_OTHER2","TradePilot_DAILY_OTHER1_LABEL","TradePilot_DAILY_OTHER2_LABEL"};
+ for(int i=0;i<ArraySize(obsolete);i++)ObjectDelete(0,obsolete[i]);
 }
-void TPDR_BudgetEquivalents(datetime period,double remaining,bool verified,bool active,string currency)
+void TPDR_BudgetEquivalents(datetime period,double remaining,bool verified,bool active,string currency,bool percent=false)
 {
  string text="";
  if(active && verified) {
   double balance=GetSessionStartBalance(period),risk=TPDR_RiskCash();
-  text="("+(balance>0 ? DoubleToString(remaining/balance*100,2)+"%" : "Percentage pending")+"; "+(risk>0 ? DoubleToString(remaining/risk,2)+"R" : "Risk pending")+")";
+  text="("+(percent ? currency+" "+DoubleToString(remaining,2) : balance>0 ? DoubleToString(remaining/balance*100,2)+"%" : "Percentage pending")+"; "+(risk>0 ? DoubleToString(remaining/risk,2)+"R" : "Risk pending")+")";
  }
  // One fitted value keeps the cash amount and equivalents together on the Budget left row.
  string key="TradePilot_LIMIT_REMAIN",amount=ObjectGetString(0,key,OBJPROP_TEXT);
  string display=amount+(text!=""?"  "+text:"");
  ObjectSetString(0,key,OBJPROP_TEXT,display);
- ObjectSetInteger(0,key,OBJPROP_FONTSIZE,TP_HeaderFont(display,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
+ ObjectSetInteger(0,key,OBJPROP_FONTSIZE,FontSize(BASE_FONT_NORMAL));
  ObjectSetString(0,key,OBJPROP_TOOLTIP,"Your remaining daily loss allowance. The cash amount is followed by its percentage and risk-unit equivalents in brackets. Green means allowance remains; red means losses exceed it. One risk unit is the cash risk currently entered in Position Sizer. This is loss allowance, not a profit target. "+display);
  if(ObjectFind(0,"TradePilot_LIMIT_OTHER")>=0)ObjectDelete(0,"TradePilot_LIMIT_OTHER");
 }

@@ -33,3 +33,6 @@ Direct MT4/MT5 trades: Manual execution. Trades placed through TradePilot contro
 ## Licence
 
 MIT. Keep the copyright and licence notice when sharing or reusing this source. MetaTrader and broker-supplied libraries are not included and retain their own terms.
+
+## 9 October 2026 development update
+The latest source adds reliable panel expansion, consistent red/green switch colors and basket spacing, zoom above Target mode, separate Daily Performance and Daily Loss Limit updates, and selected-mode change confirmations with both other equivalents. See [installation and use instructions](docs/COMPANION-INSTALLATION.md). Both platforms compile with zero errors and warnings. Final native calculations and flicker verification remain pending; this is development source, not a certified execution result. The subscription desktop remains private.

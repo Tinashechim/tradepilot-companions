@@ -155,7 +155,7 @@ void TP_BasketCostsRender(datetime period)
  CreateLabel("TradePilot_BASKET_SPREAD",spread_text,x,PanelY()+S(187),FontSize(BASE_FONT_NORMAL),C'190,195,205');
  string cost_keys[]={"BASKET_COSTS","BASKET_SWAP","BASKET_SPREAD"};
  string cost_labels[]={"Commission","Swap","Spread estimate"};
- int cost_rows[]={67,87,107};
+ int cost_rows[]={84,106,128};
  for(int i=0;i<3;i++)CreateLabel("TradePilot_"+cost_keys[i]+"_LABEL",cost_labels[i],x,PanelY()+S(cost_rows[i]),FontSize(BASE_FONT_NORMAL),C'190,195,205');
  ObjectSetString(0,"TradePilot_BASKET_SWAP",OBJPROP_TOOLTIP,"Broker-reported swap, including current accrued swap. Credits appear as negative amounts. Already included in net results.");
  ObjectSetString(0,"TradePilot_BASKET_COSTS",OBJPROP_TOOLTIP,"Broker-reported commission. Credits appear as negative amounts. Separately reported fees: "+currency+" "+DoubleToString(fees,2)+". All charges are included once in net results.");
@@ -207,7 +207,9 @@ bool TP_BasketOutcomes(datetime period,int &wins,int &losses,double &win_result,
 void TP_BasketProgressRows(datetime period)
 {
  double actual=0,adjusted=0,costs=0,spread=0,commission=0,swap=0,fees=0,gross=0;
- bool fresh=false,exits=false,verified=TP_BasketResults(period,actual,adjusted);
+ int closed_wins=0,closed_losses=0;double closed_gain=0,closed_loss=0;
+ bool fresh=false,exits=false,verified=TP_BasketOutcomes(period,closed_wins,closed_losses,closed_gain,closed_loss);
+ actual=closed_gain+closed_loss;
  bool charges=TP_BasketChargeDetails(period,costs,spread,fresh,exits,commission,swap,fees);
 #ifdef __MQL5__
  string currency=AccountInfoString(ACCOUNT_CURRENCY);
@@ -219,10 +221,10 @@ void TP_BasketProgressRows(datetime period)
  int x=PanelX()+PanelWidth()+S(24),vx=ValueX()+PanelWidth()+S(12);
  string labels[]={"Floating trades","Total P/L"};
  string values[2];values[0]=TP_BasketModeValue(period,gross,currency);values[1]=verified?TP_BasketModeValue(period,actual,currency):"Verification pending";
- int ys[]={47,242};string keys[]={"TRADES","TOTAL"};
+ int ys[]={62,264};string keys[]={"TRADES","TOTAL"};
  for(int i=0;i<2;i++){string key="TradePilot_BASKET_"+keys[i];CreateLabel(key+"_LABEL",labels[i],x,PanelY()+S(ys[i]),FontSize(BASE_FONT_NORMAL),C'190,195,205');CreateLabel(key+"_VALUE",values[i],vx,PanelY()+S(ys[i]),MathMax(4,MathMin(FontSize(BASE_FONT_NORMAL),(int)(S(124)/MathMax(1,StringLen(values[i])*0.60)))),i==1?(actual<0?C'255,100,100':actual>0?C'90,220,140':clrWhite):clrWhite);}
  ObjectSetString(0,"TradePilot_BASKET_TRADES_VALUE",OBJPROP_TOOLTIP,"Current open trades' broker price profit/loss before separately reported commission and swap. Bid/ask spread already affects this price result.");
- ObjectSetString(0,"TradePilot_BASKET_TOTAL_VALUE",OBJPROP_TOOLTIP,"Original-day basket's closed and open broker net results, including retained commission, swap and fees once. Actual results are shown regardless of Apply wins/losses progress choices.");
+ ObjectSetString(0,"TradePilot_BASKET_TOTAL_VALUE",OBJPROP_TOOLTIP,"Original-day basket's fully closed broker net results, including retained commission, swap and fees once. Actual results are shown regardless of Apply wins/losses progress choices.");
 
 #ifdef __MQL5__
  double floating=GetSessionFloatingProfit(period);bool percentage=GetSessionTargetMode(period)==DAILY_PERCENTAGE;
@@ -235,44 +237,44 @@ void TP_BasketProgressRows(datetime period)
  ObjectSetString(0,"TradePilot_PROFIT_VALUE",OBJPROP_TEXT,primary);
  ObjectSetInteger(0,"TradePilot_PROFIT_VALUE",OBJPROP_FONTSIZE,MathMax(4,MathMin(FontSize(BASE_FONT_NORMAL),(int)(S(124)/MathMax(1,StringLen(primary)*0.60)))));
  if(ObjectFind(0,"TradePilot_FLOATING_EQUIVALENTS")>=0)ObjectDelete(0,"TradePilot_FLOATING_EQUIVALENTS");
- string explanation="Floating P/L in the saved target mode, with the other two equivalents in brackets. Percentage uses original daily starting balance; Ratio uses planned cash risk. Broker floating results are distinct from total closed-plus-open net P/L. "+primary+" "+equivalents;
+ string explanation="Floating P/L in the saved target mode, with the other two equivalents in brackets. Percentage uses original daily starting balance; Ratio uses planned cash risk. Floating results are separate from Total P/L, which includes only fully closed trades. "+primary+" "+equivalents;
  ObjectSetString(0,"TradePilot_PROFIT_VALUE",OBJPROP_TOOLTIP,explanation);
  // Four outline edges keep the total readable without covering its labels.
- int total_x=PanelX()+PanelWidth()+S(20),total_y=PanelY()+S(235),total_w=S(288),total_h=S(29);
+ int total_x=PanelX()+PanelWidth()+S(20),total_y=PanelY()+S(257),total_w=S(288),total_h=S(29);
  CreateRectangle("TradePilot_TOTAL_TOP",total_x,total_y,total_w,1,C'110,125,145',C'110,125,145');
  CreateRectangle("TradePilot_TOTAL_BOTTOM",total_x,total_y+total_h,total_w,1,C'110,125,145',C'110,125,145');
  CreateRectangle("TradePilot_TOTAL_LEFT",total_x,total_y,1,total_h,C'110,125,145',C'110,125,145');
  CreateRectangle("TradePilot_TOTAL_RIGHT",total_x+total_w,total_y,1,total_h,C'110,125,145',C'110,125,145');
- ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_LABEL",OBJPROP_YDISTANCE,PanelY()+S(242));ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_VALUE",OBJPROP_YDISTANCE,PanelY()+S(242));
+ ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_LABEL",OBJPROP_YDISTANCE,PanelY()+S(264));ObjectSetInteger(0,"TradePilot_BASKET_TOTAL_VALUE",OBJPROP_YDISTANCE,PanelY()+S(264));
  string names[]={"PROFIT_LABEL","PROFIT_VALUE","TP_VALUE_LABEL","TARGET_VALUE","TARGET_OTHER1","TARGET_OTHER2","STATUS_LABEL","STATUS_VALUE","BASKET_COSTS","BASKET_SWAP","BASKET_SPREAD","BASKET_GROSS"};
- int positions[]={203,203,284,284,305,326,347,347,67,87,107,424};
+ int positions[]={225,225,302,302,305,326,324,324,84,106,128,424};
  for(int i=0;i<ArraySize(names);i++)if(ObjectFind(0,"TradePilot_"+names[i])>=0)ObjectSetInteger(0,"TradePilot_"+names[i],OBJPROP_YDISTANCE,PanelY()+S(positions[i]));
  int wins=0,losses=0;double win_result=0,loss_result=0;
  bool outcomes=TP_BasketOutcomes(period,wins,losses,win_result,loss_result);
  string outcome_keys[]={"WINS","LOSSES"};string outcome_titles[]={"Wins","Losses"};
  for(int i=0;i<2;i++) {
-  string key="TradePilot_BASKET_"+outcome_keys[i];int row=127+i*20;
+  string key="TradePilot_BASKET_"+outcome_keys[i];int row=150+i*22;
   string main="Verification pending",other1="",other2="";
   if(outcomes)TPDR_RemainingParts(period,i==0?win_result:loss_result,GetSessionStartBalance(period),currency,GlobalVariableGet(GV_DAILY_MODE)>0.5,main,other1,other2,true);
   StringReplace(other1,"Percentage: ","");StringReplace(other1,"Cash: ","");StringReplace(other1,"Ratio: ","");
   StringReplace(other2,"Percentage: ","");StringReplace(other2,"Cash: ","");StringReplace(other2,"Ratio: ","");
   string outcome_equivalents=outcomes?"("+other1+"; "+other2+")":"";
-  string display=outcomes?main+" "+outcome_equivalents:main;
+  string display=main;
   color shade=i==0?C'90,220,140':C'255,100,100';
   CreateLabel(key+"_LABEL",outcome_titles[i],x,PanelY()+S(row),FontSize(BASE_FONT_NORMAL),C'190,195,205');
-  CreateLabel(key+"_VALUE",display,vx,PanelY()+S(row),TP_HeaderFont(display,FontSize(BASE_FONT_NORMAL),S(132),S(15)),shade);
+  CreateLabel(key+"_VALUE",display,vx,PanelY()+S(row),FontSize(BASE_FONT_NORMAL),shade);
   if(ObjectFind(0,key+"_OTHER")>=0)ObjectDelete(0,key+"_OTHER");
   string help=i==0?"Profit from completed winning trades in this day's basket. The main amount follows Cash, Percentage or Ratio; brackets show the other two ways to read it. The shared counter below shows wins/losses in W/L order. Reported trading charges are included. Open and break-even trades are not wins.":"Loss from completed losing trades in this day's basket, shown as a negative amount. The main amount follows Cash, Percentage or Ratio; brackets show the other two ways to read it. The shared counter below shows wins/losses in W/L order. Reported trading charges are included. Open and break-even trades are not losses.";
   help+=" Percentage uses the day's starting balance. Ratio uses planned cash risk. MT5 counts fully closed positions; MT4 counts closed broker tickets. Apply wins/losses changes target progress, not these actual results.";
   ObjectSetString(0,key+"_LABEL",OBJPROP_TOOLTIP,help);ObjectSetString(0,key+"_VALUE",OBJPROP_TOOLTIP,help);
  }
  ObjectDelete(0,"TradePilot_BASKET_WINS_COUNT");ObjectDelete(0,"TradePilot_BASKET_LOSSES_COUNT");
- CreateLabel("TradePilot_BASKET_TRADE_COUNT_LABEL","Trade count",x,PanelY()+S(167),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateLabel("TradePilot_BASKET_TRADE_COUNT_VALUE",outcomes?IntegerToString(wins)+"/"+IntegerToString(losses)+" (W/L)":"Count pending",vx,PanelY()+S(167),FontSize(BASE_FONT_NORMAL),clrWhite);
+ CreateLabel("TradePilot_BASKET_TRADE_COUNT_LABEL","Trade count",x,PanelY()+S(194),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateLabel("TradePilot_BASKET_TRADE_COUNT_VALUE",outcomes?IntegerToString(wins)+"/"+IntegerToString(losses)+" (W/L)":"Count pending",vx,PanelY()+S(194),FontSize(BASE_FONT_NORMAL),clrWhite);
  string count_help="Completed wins / completed losses in this day's basket. 1/2 (W/L) means one win and two losses. Open and break-even trades are excluded. MT5 counts fully closed positions; MT4 counts closed broker tickets. Apply wins/losses does not change these actual counts.";
  ObjectSetString(0,"TradePilot_BASKET_TRADE_COUNT_LABEL",OBJPROP_TOOLTIP,count_help);ObjectSetString(0,"TradePilot_BASKET_TRADE_COUNT_VALUE",OBJPROP_TOOLTIP,count_help);
  // Floating P/L has a subtler outline; Total P/L remains the stronger total.
- int floating_y=PanelY()+S(196);
+ int floating_y=PanelY()+S(218);
  CreateRectangle("TradePilot_FLOAT_TOP",total_x,floating_y,total_w,1,C'65,75,90',C'65,75,90');
  CreateRectangle("TradePilot_FLOAT_BOTTOM",total_x,floating_y+S(28),total_w,1,C'65,75,90',C'65,75,90');
  CreateRectangle("TradePilot_FLOAT_LEFT",total_x,floating_y,1,S(28),C'65,75,90',C'65,75,90');
@@ -288,8 +290,8 @@ void TP_BasketProgressRows(datetime period)
   ObjectSetInteger(0,name,OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
   ObjectSetInteger(0,name,OBJPROP_XDISTANCE,x);
  }
- ObjectSetInteger(0,"TradePilot_POSITIONS_LABEL",OBJPROP_YDISTANCE,PanelY()+S(27));
- ObjectSetInteger(0,"TradePilot_POSITIONS_VALUE",OBJPROP_YDISTANCE,PanelY()+S(27));
+ ObjectSetInteger(0,"TradePilot_POSITIONS_LABEL",OBJPROP_YDISTANCE,PanelY()+S(40));
+ ObjectSetInteger(0,"TradePilot_POSITIONS_VALUE",OBJPROP_YDISTANCE,PanelY()+S(40));
  // Values occupy the right column, with left-to-right text aligned at its left edge.
  int value_left=ValueX()+PanelWidth()+S(12);
  string right_values[]={"POSITIONS_VALUE","PROFIT_VALUE","TARGET_VALUE","STATUS_VALUE","BASKET_WINS_VALUE","BASKET_LOSSES_VALUE","BASKET_TRADE_COUNT_VALUE","BASKET_TRADES_VALUE","BASKET_ESTIMATE_VALUE","BASKET_TOTAL_VALUE","BASKET_COSTS","BASKET_SWAP","BASKET_SPREAD","BASKET_GROSS"};
@@ -300,19 +302,10 @@ void TP_BasketProgressRows(datetime period)
   string value=ObjectGetString(0,name,OBJPROP_TEXT);
   ObjectSetInteger(0,name,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
  }
- string other_keys[]={"TARGET_OTHER1","TARGET_OTHER2"};
- for(int i=0;i<2;i++) {
-  string name="TradePilot_"+other_keys[i],value=ObjectGetString(0,name,OBJPROP_TEXT);
-  int split=StringFind(value,": ");string caption=split>=0?StringSubstr(value,0,split):"Equivalent";
-  if(split>=0)value=StringSubstr(value,split+2);
-  CreateLabel(name+"_LABEL",caption,x,PanelY()+S(305+i*21),FontSize(BASE_FONT_NORMAL),C'190,195,205');
-  ObjectSetString(0,name,OBJPROP_TEXT,value);
-  ObjectSetInteger(0,name,OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
-  ObjectSetInteger(0,name,OBJPROP_XDISTANCE,value_left);
-  ObjectSetInteger(0,name,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
- }
- if(ObjectFind(0,"TradePilot_BASKET_COLUMN_BG")>=0)ObjectSetInteger(0,"TradePilot_BASKET_COLUMN_BG",OBJPROP_YSIZE,S(478));
- if(ObjectFind(0,"TradePilot_CURRENT_BORDER")>=0)ObjectSetInteger(0,"TradePilot_CURRENT_BORDER",OBJPROP_YSIZE,S(366));
+ string obsolete_equivalents[]={"TARGET_OTHER1","TARGET_OTHER2","TARGET_OTHER1_LABEL","TARGET_OTHER2_LABEL","FLOATING_EQUIVALENTS"};
+ for(int i=0;i<ArraySize(obsolete_equivalents);i++)ObjectDelete(0,"TradePilot_"+obsolete_equivalents[i]);
+ if(ObjectFind(0,"TradePilot_BASKET_COLUMN_BG")>=0)ObjectSetInteger(0,"TradePilot_BASKET_COLUMN_BG",OBJPROP_YSIZE,S(458));
+ if(ObjectFind(0,"TradePilot_CURRENT_BORDER")>=0)ObjectSetInteger(0,"TradePilot_CURRENT_BORDER",OBJPROP_YSIZE,S(346));
  // Carry-over owns a padded container; no divider may cross its text.
  // Resize the existing background only; creating it here would put it above the labels.
  ObjectSetInteger(0,"TradePilot_CARRY_BORDER",OBJPROP_XDISTANCE,PanelX()+PanelWidth()+S(18));
@@ -323,7 +316,7 @@ void TP_BasketProgressRows(datetime period)
  string carry_values[]={"CARRY_BASKETS_VALUE","CARRY_POSITIONS_VALUE","CARRY_PROFIT_VALUE","CARRY_PL_VALUE"};
  for(int i=0;i<ArraySize(carry_values);i++){string key="TradePilot_"+carry_values[i];if(ObjectFind(0,key)<0)continue;ObjectSetInteger(0,key,OBJPROP_XDISTANCE,value_left);ObjectSetInteger(0,key,OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);string value=ObjectGetString(0,key,OBJPROP_TEXT);ObjectSetInteger(0,key,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));}
  string carry[]={"CARRY_BORDER","CARRY_DIVIDER","CARRY_TITLE","CARRY_BASKETS_LABEL","CARRY_BASKETS_VALUE","CARRY_POSITIONS_LABEL","CARRY_POSITIONS_VALUE","CARRY_PROFIT_LABEL","CARRY_PROFIT_VALUE","CARRY_CURRENCY","CARRY_PL_LABEL","CARRY_PL_VALUE"};
- int carry_rows[]={370,370,380,403,403,423,423,443,443,444,443,443};
+ int carry_rows[]={350,350,360,383,383,403,403,423,423,424,423,423};
  for(int i=0;i<ArraySize(carry);i++){string name="TradePilot_"+carry[i];if(ObjectFind(0,name)<0)continue;ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+S(carry_rows[i]));if(carry[i]=="CARRY_BORDER")ObjectSetInteger(0,name,OBJPROP_YSIZE,S(108));}
 }
 

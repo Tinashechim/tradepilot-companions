@@ -337,5 +337,10 @@ PANEL DISPLAY UPDATE (1.0.32)
 The main panel and Current Basket have independent switches. Switching a panel changes its display only; it does not change trading permissions. Total P/L uses a thicker border than Floating P/L. Keep trading off while checking display changes.
 
 SETTINGS — AUTOMATIC EMAIL NOTIFICATIONS
-Open Settings and clear Automatic email notifications, then enter your current local password and Save. This cancels pending automatic connection, trade, target, payment, statement and battery emails. Send Mail and documents you deliberately email remain available. Activity history and trading safeguards remain active. Switch it on and Save to receive future notices again; cancelled emails are not replayed. Editing windows can be minimized, restored or closed using X without blocking Accounts.
+Open Settings and clear Automatic email notifications, then click Save in the Email Notifications tab. This cancels pending automatic connection, trade, target, payment, statement and battery emails. Send Mail and documents you deliberately email remain available. Activity history and trading safeguards remain active. Switch it on and Save to receive future notices again; cancelled emails are not replayed. Editing windows can be minimized, restored or closed using X without blocking Accounts.
 
+
+SETTINGS TABS
+Password, Email Notifications and Inactivity each have their own Save button. Only Password asks for your current local password. Saving a tab changes only that tab. Author and version appear below its buttons.
+
+Point Measurer shows the numerical broker spread without a one-lot cost row. Risk and Potential sit directly below the spread display.

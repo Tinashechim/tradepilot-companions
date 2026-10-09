@@ -51,7 +51,7 @@ bool TPDR_Target(datetime period,double factor,double &target)
 void TPDR_Render(datetime period)
 {
  bool ratio=TPDR_Enabled();
- string mode=ratio?"Ratio":(GetDailyTargetMode()==DAILY_PERCENTAGE?"Percentage":"Cash");
+ string mode=ratio?"RATIO":(GetDailyTargetMode()==DAILY_PERCENTAGE?"PERCENTAGE":"CASH");
  string unit=ratio?"R:R":(GetDailyTargetMode()==DAILY_PERCENTAGE?"%":AccountInfoString(ACCOUNT_CURRENCY));
  if(ObjectGetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TEXT)!=mode)ObjectSetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TEXT,mode);
  if(ObjectGetString(0,"TradePilot_DAILY_TARGET_UNIT",OBJPROP_TEXT)!=unit)ObjectSetString(0,"TradePilot_DAILY_TARGET_UNIT",OBJPROP_TEXT,unit);

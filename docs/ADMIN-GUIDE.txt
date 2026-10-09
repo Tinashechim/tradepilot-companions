@@ -341,6 +341,14 @@ Open Settings and clear Automatic email notifications, then click Save in the Em
 
 
 SETTINGS TABS
-Password, Email Notifications and Inactivity each have their own Save button. Only Password asks for your current local password. Saving a tab changes only that tab. Author and version appear below its buttons.
+Password, Email Notifications and Inactivity each have their own Save button. Only Password asks for your current local password. Saving a tab changes only that tab. Author and version appear on the sign-in screen and below the main Settings and Lock TradePilot buttons; they are not repeated inside Settings tabs.
 
 Point Measurer shows the numerical broker spread without a one-lot cost row. Risk and Potential sit directly below the spread display.
+
+Apply wins and Apply losses use clean centred wording. Red means OFF and green means ON; square-bracket marks are not shown.
+
+Target Mode, Limit Mode and Risk Mode buttons share the same width and alignment in both terminal panels.
+
+APPLY WINS and APPLY LOSSES are uppercase and use the same button dimensions and font as the Position Sizer SL LINE and SPREAD switches.
+
+The two UPDATE buttons, Target/Limit/Risk Mode button values, and Point Measurer SPREAD ON/OFF and POTENTIAL captions are uppercase. Button colours and calculations retain their existing meaning.

@@ -155,9 +155,9 @@ void TPDL_Render()
  ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_YSIZE,S(24));
  CreateLabel("TradePilot_LIMIT_TITLE","DAILY LOSS LIMIT",LabelX(),y+S(243),FontSize(BASE_FONT_SECTION),C'90,180,255');
  CreateLabel("TradePilot_LIMIT_MODE_LABEL","Limit mode",LabelX(),y+S(264),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateButton("TradePilot_LIMIT_MODE",tpdl_edit_percent?"Percentage":"Cash",ValueX(),y+S(260),S(130),S(19),C'55,60,70');
+ CreateButton("TradePilot_LIMIT_MODE",tpdl_edit_percent?"PERCENTAGE":"CASH",ValueX(),y+S(260),S(130),S(19),C'55,60,70');
  CreateLabel("TradePilot_LIMIT_LABEL","Loss limit",LabelX(),y+S(290),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateButton("TradePilot_LIMIT_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,y+S(425),S(88),S(19),C'55,60,70');
+ CreateButton("TradePilot_LIMIT_UPDATE","UPDATE",(LabelX()+ValueX()+S(130)-S(88))/2,y+S(425),S(88),S(19),C'55,60,70');
  ObjectSetString(0,"TradePilot_LIMIT_UPDATE",OBJPROP_TOOLTIP,"Review Apply wins and Apply losses, then save the daily loss limit and these choices. Your daily target is saved using Update under Daily Performance.");
  double net=0,remaining=0;bool blocked=false;bool verified=TPDL_State(net,remaining,blocked);
  CreateLabel("TradePilot_LIMIT_REMAIN_LABEL","Budget left",LabelX(),y+S(314),FontSize(BASE_FONT_NORMAL),C'190,195,205');

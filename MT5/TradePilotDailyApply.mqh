@@ -23,8 +23,8 @@ void TPDA_TargetSave(datetime period)
 void TPDA_LimitButtons()
 {
  datetime period=GetSessionStartForTime(TPDL_Now());TPDA_Load(period);
- CreateButton("TradePilot_LIMIT_WINS",(tp_limit_wins?"[X]":"[ ]")+" Apply wins",LabelX(),PanelY()+S(398),S(130),S(20),tp_limit_wins?C'35,115,80':C'140,45,45');
- CreateButton("TradePilot_LIMIT_LOSSES",(tp_limit_losses?"[X]":"[ ]")+" Apply losses",ValueX(),PanelY()+S(398),S(130),S(20),tp_limit_losses?C'35,115,80':C'140,45,45');
+ CreateButton("TradePilot_LIMIT_WINS","APPLY WINS",LabelX(),PanelY()+S(398),S(130),S(20),tp_limit_wins?C'35,115,80':C'140,45,45');
+ CreateButton("TradePilot_LIMIT_LOSSES","APPLY LOSSES",ValueX(),PanelY()+S(398),S(130),S(20),tp_limit_losses?C'35,115,80':C'140,45,45');
  ObjectSetString(0,"TradePilot_LIMIT_WINS",OBJPROP_TOOLTIP,"Add this day's completed Current Basket wins to the loss allowance. Preview changes immediately; Update reviews and saves. Default OFF.");
  ObjectSetString(0,"TradePilot_LIMIT_LOSSES",OBJPROP_TOOLTIP,"Subtract this day's completed Current Basket losses from the loss allowance. Preview changes immediately; Update reviews and saves. Default OFF. Other open risk still counts.");
 }

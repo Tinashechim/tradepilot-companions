@@ -1892,10 +1892,10 @@ void CreatePanel()
 
    CreateButton(
       "TradePilot_DAILY_MODE_BUTTON",
-      TPDR_Enabled()?"Ratio":(daily_percentage_mode ? "Percentage" : "Cash"),
+      TPDR_Enabled()?"RATIO":(daily_percentage_mode ? "PERCENTAGE" : "CASH"),
       ValueX(),
       py + S(63),
-      S(88),
+      S(130),
       S(19),
       C'55,60,70'
    );
@@ -1957,10 +1957,10 @@ void CreatePanel()
 
    CreateButton(
       "TradePilot_RISK_MODE_BUTTON",
-      risk_percentage_mode ? "Percentage" : "Money",
+      risk_percentage_mode ? "PERCENTAGE" : "MONEY",
       ValueX(),
       py + S(518),
-      S(88),
+      S(130),
       S(19),
       C'55,60,70'
    );
@@ -2020,14 +2020,14 @@ void CreatePanel()
       sl_line_enabled ? "SL LINE ON" : "SL LINE OFF",
       LabelX(),
       py + S(614),
-      S(88),
-      S(19),
+      S(130),
+      S(20),
       sl_line_enabled
       ? C'35,115,80'
       : C'140,45,45'
    );
 
-   CreateButton("TradePilot_SPREAD_TOGGLE",tp_spread_on?"SPREAD ON":"SPREAD OFF",ValueX(),py + S(614),S(124),S(19),tp_spread_on?C'35,115,80':C'140,45,45');
+   CreateButton("TradePilot_SPREAD_TOGGLE",tp_spread_on?"SPREAD ON":"SPREAD OFF",ValueX(),py + S(614),S(130),S(20),tp_spread_on?C'35,115,80':C'140,45,45');
    ObjectSetString(0,"TradePilot_SPREAD_TOGGLE",OBJPROP_TOOLTIP,"ON moves the planned stop one current spread farther from entry and recalculates size. OFF restores the unadjusted stop. Starts OFF. It does not change stops on existing trades.");
 
    CreateLabel("TradePilot_CALCULATED_LABEL", "Calculated Size",
@@ -2650,8 +2650,8 @@ void OnChartEvent(
          "TradePilot_DAILY_MODE_BUTTON",
          OBJPROP_TEXT,
          daily_percentage_mode
-         ? "Percentage"
-         : "Money"
+         ? "PERCENTAGE"
+         : "MONEY"
       );
 
       ObjectSetString(
@@ -2693,8 +2693,8 @@ void OnChartEvent(
          "TradePilot_RISK_MODE_BUTTON",
          OBJPROP_TEXT,
          risk_percentage_mode
-         ? "Percentage"
-         : "Money"
+         ? "PERCENTAGE"
+         : "MONEY"
       );
 
       ObjectSetString(
@@ -2936,7 +2936,7 @@ bool TPM_SpreadRefresh()
 #endif
   if(!MathIsValidNumber(tpm_spread_cash) || tpm_spread_cash<=0)tpm_spread_cash=-1;
  }
- TPM_Widget("SPREAD",OBJ_BUTTON,12,185,132,24,tpm_spread_on?"Spread ON":"Spread OFF",clrWhite,tpm_spread_on?C'35,115,80':C'140,45,45');
+ TPM_Widget("SPREAD",OBJ_BUTTON,12,185,132,24,tpm_spread_on?"SPREAD ON":"SPREAD OFF",clrWhite,tpm_spread_on?C'35,115,80':C'140,45,45');
  ObjectSetString(0,"TPM_SPREAD",OBJPROP_TOOLTIP,"Use only this chart's broker spread. ON moves this measuring stop one current spread farther from entry and updates its ratio; OFF restores the base measuring stop. Dragging the stop creates a new base. It never changes a broker order or the position sizer's separate spread control.");
  string caption=fresh?"Spread: "+DoubleToString(tpm_spread_price/_Point,1)+" points":"Spread: waiting for broker quote";
  TPM_Widget("SPREAD_INFO",OBJ_LABEL,12,212,0,0,caption,clrWhite,clrNONE);
@@ -2984,7 +2984,7 @@ void TPM_Render()
    color potential_font=ready?(opposite?tpm_colors[2]:tpm_colors[1]):clrSilver;
    TPM_Widget("RETURN_BORDER",OBJ_RECTANGLE_LABEL,8,266,288,28,"",potential_color,C'24,29,39');
    ObjectSetInteger(0,"TPM_RETURN_BORDER",OBJPROP_BORDER_COLOR,potential_color);
-   TPM_Widget("RETURN", OBJ_LABEL, 12, 273, 0, 0, "Potential   "+(valid ? DoubleToString(rr*tpm_risk,2)+" "+unit : "n/a"), potential_font, clrNONE, 10);
+   TPM_Widget("RETURN", OBJ_LABEL, 12, 273, 0, 0, "POTENTIAL   "+(valid ? DoubleToString(rr*tpm_risk,2)+" "+unit : "n/a"), potential_font, clrNONE, 10);
    ObjectSetString(0,"TPM_RETURN",OBJPROP_TOOLTIP,"Potential is the measured target value. Green means entry is between Stop Loss and Take Profit. Red means both lines are on the same side of entry, so this is not a valid profit-and-loss layout. Move one line across entry. This is a measurement, not a realised trading loss.");
 
    ObjectSetInteger(0,"TPM_BG",OBJPROP_YSIZE,TPM_S(ready && !opposite?322:302));
@@ -3054,9 +3054,9 @@ void TP_DailyChoiceRender()
 {
  if(tp_daily_choice_session!=GetSessionStartForTime(TPDL_Now())) {tp_daily_choice_session=GetSessionStartForTime(TPDL_Now());tp_daily_wins=TP_DailyInclude(tp_daily_choice_session,1);tp_daily_losses=TP_DailyInclude(tp_daily_choice_session,-1);}
  int x=LabelX(),y=PanelY()+S(184);
- CreateButton("TradePilot_DAILY_CHOICE_WINS",(tp_daily_wins ? "[X]" : "[ ]")+" Apply wins",x,y,S(130),S(20),tp_daily_wins?C'35,115,80':C'140,45,45');
- CreateButton("TradePilot_DAILY_CHOICE_LOSSES",(tp_daily_losses ? "[X]" : "[ ]")+" Apply losses",ValueX(),y,S(130),S(20),tp_daily_losses?C'35,115,80':C'140,45,45');
- CreateButton("TradePilot_DAILY_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,PanelY()+S(211),S(88),S(19),C'55,60,70');
+ CreateButton("TradePilot_DAILY_CHOICE_WINS","APPLY WINS",x,y,S(130),S(20),tp_daily_wins?C'35,115,80':C'140,45,45');
+ CreateButton("TradePilot_DAILY_CHOICE_LOSSES","APPLY LOSSES",ValueX(),y,S(130),S(20),tp_daily_losses?C'35,115,80':C'140,45,45');
+ CreateButton("TradePilot_DAILY_UPDATE","UPDATE",(LabelX()+ValueX()+S(130)-S(88))/2,PanelY()+S(211),S(88),S(19),C'55,60,70');
  ObjectSetString(0,"TradePilot_DAILY_UPDATE",OBJPROP_TOOLTIP,"Click to save Daily Performance: target, Apply wins and Apply losses. Daily Loss Limit has its own Update. Red/green applies to ON/OFF switches; Update is a save action. Invalid input leaves settings unchanged.");
  ObjectSetString(0,"TradePilot_DAILY_CHOICE_WINS",OBJPROP_TOOLTIP,"Default OFF. Turn ON to subtract this day's completed Current Basket wins from the daily target. The preview updates immediately. Update and Yes saves this section only; reports keep actual results.");
  ObjectSetString(0,"TradePilot_DAILY_CHOICE_LOSSES",OBJPROP_TOOLTIP,"Default OFF. Turn ON to add this day's completed Current Basket losses to the daily target. The preview updates immediately. Update and Yes saves this section only. Daily Loss Limit has separate choices.");

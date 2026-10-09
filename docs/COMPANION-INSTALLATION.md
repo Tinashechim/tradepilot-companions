@@ -56,7 +56,7 @@ If TradePilot does not appear in Navigator, verify you used **this terminal's** 
 
 ## Development status
 
-This is MIT-licensed development source. The latest build passes 237 desktop regression checks and both native compilations without errors or warnings. Remaining native checks, broker execution tests and final release packaging must pass before the next Microsoft submission. See [README](README.md) for repository scope and [Admin Guide](ADMIN-GUIDE.txt) for desktop administration.
+This is MIT-licensed development source. The latest build passes 245 desktop regression checks and both native compilations without errors or warnings. Remaining native checks, broker execution tests and final release packaging must pass before the next Microsoft submission. See [README](README.md) for repository scope and [Admin Guide](ADMIN-GUIDE.txt) for desktop administration.
 
 
 ## Current panel update confirmations
@@ -66,3 +66,6 @@ These are development changes: complete native calculation and flicker verificat
 
 ## Checking results before a daily loss update
 Before updating Daily Loss Limit, open Current Basket and check Wins, Losses, Trade count and closed Total P/L for the current broker day. Use those actual results when reviewing your allowance. Choose Apply wins and Apply losses deliberately: ON includes that result in progress toward the daily target; OFF leaves it out of target progress. These switches never remove trades from reports or exclude losses from the Daily Loss Limit safety check, which always counts both wins and losses plus open results. Press Daily Loss Limit Update, review the increase/decrease and both switch states, then choose Yes to save or No to cancel. Check Current Basket again after saving; older carry-over baskets remain separate.
+
+## Independent daily controls (1.0.29)
+Daily Performance and Daily Loss Limit each have their own Apply wins/losses controls above Update. Performance subtracts selected completed Current Basket wins from its base target and adds selected losses. Loss Limit adds selected wins to its allowance and subtracts selected losses. Preview changes immediately; the section's Update and Yes saves it. Enter in either input opens the same review. Repeated updates count completed outcomes once. Daily Performance shows Closed P/L and Remaining target; Budget left stays in Daily Loss Limit. Both sets start OFF for a new broker day. Turning a display panel ON does not enable trading. Layout and live outcome checks remain separate from successful compilation.

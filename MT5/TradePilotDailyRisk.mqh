@@ -65,7 +65,12 @@ bool TPDL_Totals(double &closed,double &floating,double &adjusted)
 bool TPDL_State(double &net,double &remaining,bool &blocked)
 {
  double closed=0,floating=0,adjusted=0;bool verified=TPDL_Totals(closed,floating,adjusted);net=closed+floating;
- double cash=TPDL_Cash();remaining=cash>0 ? MathMax(0,cash+net) : -1;
+ double cash=TPDL_Cash();
+ if(TPDA_Flag(GetSessionStartForTime(TPDL_Now()),"LIMIT_MODEL")){
+  double wins=0,losses=0;verified=verified && TPDA_Closed(GetSessionStartForTime(TPDL_Now()),wins,losses);
+  net-=wins+losses;net+=(TPDA_Flag(GetSessionStartForTime(TPDL_Now()),"LIMIT_WINS")?wins:0)+(TPDA_Flag(GetSessionStartForTime(TPDL_Now()),"LIMIT_LOSSES")?losses:0);
+ }
+ remaining=cash>0 ? MathMax(0,cash+net) : -1;
  string key=TPDL_DayKey("HIT");blocked=GlobalVariableCheck(key) && GlobalVariableGet(key)>0;
  if(cash>0 && verified && net<=-cash) {GlobalVariableSet(key,1);blocked=true;}
  if(cash<=0) blocked=false;
@@ -140,22 +145,22 @@ void TPDL_Render()
  if(tpdl_ui_period!=period) {tpdl_ui_period=period;tpdl_edit_percent=TPDL_Percent();}
  int y=PanelY();
 #ifdef __MQL5__
- if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(208),S(72));
+ if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(284),S(72));
 #else
- if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(208),S(72),S(19));
+ if(ObjectFind(0,"TradePilot_LIMIT_EDIT")<0) CreateEdit("TradePilot_LIMIT_EDIT",TPDL_Limit()>0?DoubleToString(TPDL_Limit(),2):"",ValueX(),y+S(284),S(72),S(19));
 #endif
- ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_YDISTANCE,y+S(208));
+ ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_YDISTANCE,y+S(284));
  ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_XDISTANCE,ValueX());
  ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_XSIZE,S(130));
  ObjectSetInteger(0,"TradePilot_LIMIT_EDIT",OBJPROP_YSIZE,S(24));
- CreateLabel("TradePilot_LIMIT_TITLE","DAILY LOSS LIMIT",LabelX(),y+S(167),FontSize(BASE_FONT_SECTION),C'90,180,255');
- CreateLabel("TradePilot_LIMIT_MODE_LABEL","Limit mode",LabelX(),y+S(188),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateButton("TradePilot_LIMIT_MODE",tpdl_edit_percent?"Percentage":"Cash",ValueX(),y+S(184),S(130),S(19),C'55,60,70');
- CreateLabel("TradePilot_LIMIT_LABEL","Loss limit",LabelX(),y+S(214),FontSize(BASE_FONT_NORMAL),C'190,195,205');
- CreateButton("TradePilot_LIMIT_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,y+S(349),S(88),S(19),C'55,60,70');
+ CreateLabel("TradePilot_LIMIT_TITLE","DAILY LOSS LIMIT",LabelX(),y+S(243),FontSize(BASE_FONT_SECTION),C'90,180,255');
+ CreateLabel("TradePilot_LIMIT_MODE_LABEL","Limit mode",LabelX(),y+S(264),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateButton("TradePilot_LIMIT_MODE",tpdl_edit_percent?"Percentage":"Cash",ValueX(),y+S(260),S(130),S(19),C'55,60,70');
+ CreateLabel("TradePilot_LIMIT_LABEL","Loss limit",LabelX(),y+S(290),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateButton("TradePilot_LIMIT_UPDATE","Update",(LabelX()+ValueX()+S(130)-S(88))/2,y+S(425),S(88),S(19),C'55,60,70');
  ObjectSetString(0,"TradePilot_LIMIT_UPDATE",OBJPROP_TOOLTIP,"Review Apply wins and Apply losses, then save the daily loss limit and these choices. Your daily target is saved using Update under Daily Performance.");
  double net=0,remaining=0;bool blocked=false;bool verified=TPDL_State(net,remaining,blocked);
- CreateLabel("TradePilot_LIMIT_REMAIN_LABEL","Budget left",LabelX(),y+S(238),FontSize(BASE_FONT_NORMAL),C'190,195,205');
+ CreateLabel("TradePilot_LIMIT_REMAIN_LABEL","Budget left",LabelX(),y+S(314),FontSize(BASE_FONT_NORMAL),C'190,195,205');
  string currency=
 #ifdef __MQL5__
  AccountInfoString(ACCOUNT_CURRENCY);
@@ -164,8 +169,13 @@ void TPDL_Render()
 #endif
  // Show the signed allowance while keeping the risk-cap calculation clamped at zero.
  double displayed_budget=TPDL_Cash()+net;
+ double pwins=0,plosses=0;if(TPDA_Closed(period,pwins,plosses)){
+  if(TPDA_Flag(period,"LIMIT_MODEL"))net-= (TPDA_Flag(period,"LIMIT_WINS")?pwins:0)+(TPDA_Flag(period,"LIMIT_LOSSES")?plosses:0);
+  else net-=pwins+plosses;
+  string draft_text=ObjectGetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TEXT);double draft_limit=StringToDouble(draft_text);if(MathIsValidNumber(draft_limit) && draft_limit>=0 && (!tpdl_edit_percent || draft_limit<=100))displayed_budget=(tpdl_edit_percent?GetSessionStartBalance(period)*draft_limit/100:draft_limit)+net+(tp_limit_wins?pwins:0)+(tp_limit_losses?plosses:0);
+ }
  color budget_color=!verified?C'190,195,205':displayed_budget<0?clrRed:displayed_budget>0?C'90,220,140':clrWhite;
- CreateValue("TradePilot_LIMIT_REMAIN",TPDL_Limit()<=0?"No daily limit":!verified?"Not verified":(tpdl_edit_percent && GetSessionStartBalance(period)>0 ? DoubleToString(displayed_budget/GetSessionStartBalance(period)*100,2)+"%" : currency+" "+DoubleToString(displayed_budget,2)),y+S(238),budget_color);
+ CreateValue("TradePilot_LIMIT_REMAIN",TPDL_Limit()<=0?"No daily limit":!verified?"Not verified":(tpdl_edit_percent && GetSessionStartBalance(period)>0 ? DoubleToString(displayed_budget/GetSessionStartBalance(period)*100,2)+"%" : currency+" "+DoubleToString(displayed_budget,2)),y+S(314),budget_color);
  ObjectSetInteger(0,"TradePilot_LIMIT_REMAIN",OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
  ObjectSetInteger(0,"TradePilot_LIMIT_REMAIN",OBJPROP_XDISTANCE,ValueX());
  TPDR_BudgetEquivalents(GetSessionStartForTime(TPDL_Now()),displayed_budget,verified,TPDL_Limit()>0,currency,tpdl_edit_percent);
@@ -188,8 +198,8 @@ void TPDL_ClosedSummary()
  string old[]={"TradePilot_CLOSED_PERCENT_LABEL","TradePilot_CLOSED_PERCENT_VALUE"};
  string remaining_label="TradePilot_DAILY_REMAINING_LABEL",remaining_value="TradePilot_DAILY_REMAINING_VALUE";
 #endif
- ObjectSetInteger(0,key,OBJPROP_YDISTANCE,PanelY()+S(257));
- ObjectSetInteger(0,"TradePilot_DAILY_CLOSED_LABEL",OBJPROP_YDISTANCE,PanelY()+S(257));
+ ObjectSetInteger(0,key,OBJPROP_YDISTANCE,PanelY()+S(333));
+ ObjectSetInteger(0,"TradePilot_DAILY_CLOSED_LABEL",OBJPROP_YDISTANCE,PanelY()+S(333));
  string cash=currency+" "+DoubleToString(closed,2),percent=balance>0?DoubleToString(closed/balance*100,2)+"%":"Percentage pending";
  string value=!ready?"Verification pending":tpdl_edit_percent?percent+" ("+cash+")":cash+" ("+percent+")";
  ObjectSetString(0,key,OBJPROP_TEXT,value);ObjectSetInteger(0,key,OBJPROP_FONTSIZE,TP_HeaderFont(value,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
@@ -205,8 +215,8 @@ void TPDL_ClosedSummary()
  ObjectSetString(0,remaining_value,OBJPROP_TEXT,remaining_text);
  ObjectSetInteger(0,remaining_value,OBJPROP_FONTSIZE,TP_HeaderFont(remaining_text,FontSize(BASE_FONT_NORMAL),S(132),S(15)));
  ObjectSetString(0,remaining_value,OBJPROP_TOOLTIP,"Amount still needed to reach the saved daily target, after the wins and losses you chose to apply. Shown in this section's Cash or Percentage mode; brackets show the other equivalent. Changing the loss-limit mode does not change the saved target.");
- ObjectSetInteger(0,remaining_label,OBJPROP_YDISTANCE,PanelY()+S(276));ObjectSetInteger(0,remaining_value,OBJPROP_YDISTANCE,PanelY()+S(276));
- ObjectSetInteger(0,"TradePilot_DAILY_STATUS_LABEL",OBJPROP_YDISTANCE,PanelY()+S(295));ObjectSetInteger(0,"TradePilot_DAILY_STATUS_VALUE",OBJPROP_YDISTANCE,PanelY()+S(295));
+ ObjectSetInteger(0,remaining_label,OBJPROP_YDISTANCE,PanelY()+S(352));ObjectSetInteger(0,remaining_value,OBJPROP_YDISTANCE,PanelY()+S(352));
+ ObjectSetInteger(0,"TradePilot_DAILY_STATUS_LABEL",OBJPROP_YDISTANCE,PanelY()+S(371));ObjectSetInteger(0,"TradePilot_DAILY_STATUS_VALUE",OBJPROP_YDISTANCE,PanelY()+S(371));
 }
 bool TPDL_ReadPending(double &value)
 {
@@ -237,7 +247,10 @@ bool TPDL_Event(string name)
   double balance=GetSessionStartBalance(preview_period),risk=TPDR_SavedRisk(preview_period);
   if(tpdl_edit_percent && proposed_value>0 && balance<=0){Alert("Wait for a verified starting balance before reviewing a percentage loss limit.");return true;}
   double proposed_cash=tpdl_edit_percent?balance*proposed_value/100:proposed_value;
-  double delta=proposed_cash-TPDL_Cash(),amount=MathAbs(delta);
+  double wins=0,losses=0;if(!TPDA_Closed(preview_period,wins,losses)){Alert("Wait for verified Current Basket results before applying wins or losses.");return true;}
+  proposed_cash=TPDA_Adjust(proposed_cash,wins,losses,tp_limit_wins,tp_limit_losses,false);
+  double current_cash=TPDL_Cash();if(TPDA_Flag(preview_period,"LIMIT_MODEL"))current_cash=TPDA_Adjust(current_cash,wins,losses,TPDA_Flag(preview_period,"LIMIT_WINS"),TPDA_Flag(preview_period,"LIMIT_LOSSES"),false);
+  double delta=proposed_cash-current_cash,amount=MathAbs(delta);
   string cash=AccountInfoString(ACCOUNT_CURRENCY)+" "+DoubleToString(amount,2);
   string percentage=balance>0?DoubleToString(amount/balance*100,2)+"%":"Percentage pending";
   string ratio=risk>0?DoubleToString(amount/risk,2)+"R":"Ratio pending";

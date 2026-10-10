@@ -62,6 +62,7 @@ PANEL DISPLAY UPDATE (1.0.32)
 SETTINGS — AUTOMATIC EMAIL NOTIFICATIONS
 SETTINGS TABS
 SIZING EXPLANATIONS AND ADMIN EMAIL CHOICES
+POSITION SIZER RISK ROW
 POSITION SIZER RISK EQUIVALENTS
 EXECUTED TRADES
 DAILY LOSS LIMITS
@@ -394,6 +395,10 @@ Required Margin always describes the displayed lot size. A red requested size re
 Calculated Size shows the risk-based lot size numerically in red when current free margin cannot fund it. Required Margin retains that exact label and shows the broker-calculated amount for the displayed size, in red when insufficient and green when verified affordable. Moving the planned stop recalculates size and margin. Hover explains current free margin and rejection. A red displayed size is an estimate, not permission to send; final execution repeats all eligibility checks.
 
 Calculated lots display two decimal places on both platforms; broker lot-step precision is retained for order validation. Settings has one Don’t receive email notifications option for all accounts. It reflects either previously saved email stop; no preferences change until Save.
+
+
+POSITION SIZER RISK ROW
+The Risk input starts in the same column as Entry Price and Stop Loss. The selected percentage or cash amount stays editable, and the other equivalents appear immediately beside it in brackets. Percentage uses the current connected broker balance. Cash uses the account currency; 1R is that entered cash risk. Changing these values does not grant trading permission.
 
 
 POSITION SIZER RISK EQUIVALENTS

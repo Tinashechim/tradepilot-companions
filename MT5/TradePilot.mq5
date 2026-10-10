@@ -4032,6 +4032,7 @@ bool TP_DailyChoiceEvent(string name)
 
 void TP_DailyEquivalent()
 {
+ TP_SizerRiskEquivalents();
  datetime period=GetDailySessionStart();
  TPDR_TargetEquivalents(period,GetSessionTargetMoney(period),GetSessionTargetMode(period)==DAILY_PERCENTAGE,AccountInfoString(ACCOUNT_CURRENCY));
  double remaining=GetSessionRemainingTargetMoney(period),balance=GetSessionStartBalance(period);
@@ -4138,4 +4139,34 @@ void TP_SizeFailure(string title,string reason)
  ObjectSetInteger(0,"TradePilot_SIZE_VALUE",OBJPROP_COLOR,C'255,100,100');
  ObjectSetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TEXT,"Not calculated");
  TP_SizeRowLayout();ChartRedraw();
+}
+
+// The entered risk is one planned risk unit; do not change sizing or order volume.
+void TP_SizerRiskEquivalents()
+{
+ if(ObjectFind(0,"TradePilot_RISK_EDIT")<0 || ObjectFind(0,"TradePilot_RISK_UNIT")<0)return;
+ double entered=StringToDouble(ObjectGetString(0,"TradePilot_RISK_EDIT",OBJPROP_TEXT));
+#ifdef __MQL5__
+ bool percent=risk_mode==RISK_PERCENTAGE;
+ double balance=AccountInfoDouble(ACCOUNT_BALANCE);
+ string currency=AccountInfoString(ACCOUNT_CURRENCY);
+#else
+ bool percent=risk_percentage_mode;
+ double balance=AccountBalance();
+ string currency=AccountCurrency();
+#endif
+ bool ready=TerminalInfoInteger(TERMINAL_CONNECTED) && MathIsValidNumber(balance) && balance>0 && MathIsValidNumber(entered) && entered>0 && currency!="";
+ double cash=percent?balance*entered/100:entered;
+ string suffix=(percent?"%":currency)+" (Pending; Pending)";
+ if(ready)suffix=percent?"% ("+currency+" "+DoubleToString(cash,2)+"; 1R)":currency+" ("+DoubleToString(entered/balance*100,2)+"%; 1R)";
+ string help="Risk is the planned loss at the selected stop before broker execution effects. Percentage uses your current broker account balance; Cash uses its account currency. 1R means one entered cash-risk amount, not a promised return. The brackets show the other two equivalents. "+(ready?suffix:"Wait for a connected account balance and enter positive risk to show equivalents.");
+ ObjectSetInteger(0,"TradePilot_RISK_EDIT",OBJPROP_XDISTANCE,LabelX()+S(46));
+ ObjectSetInteger(0,"TradePilot_RISK_EDIT",OBJPROP_XSIZE,S(54));
+ ObjectSetInteger(0,"TradePilot_RISK_UNIT",OBJPROP_XDISTANCE,LabelX()+S(106));
+ ObjectSetString(0,"TradePilot_RISK_UNIT",OBJPROP_TEXT,suffix);
+ ObjectSetInteger(0,"TradePilot_RISK_UNIT",OBJPROP_FONTSIZE,TP_HeaderFont(suffix,FontSize(BASE_FONT_NORMAL),PanelWidth()-S(132),S(8)));
+ ObjectSetInteger(0,"TradePilot_RISK_UNIT",OBJPROP_COLOR,ready?clrWhite:C'220,90,90');
+ ObjectSetString(0,"TradePilot_RISK_EDIT",OBJPROP_TOOLTIP,help);
+ ObjectSetString(0,"TradePilot_RISK_UNIT",OBJPROP_TOOLTIP,help);
+ ObjectSetString(0,"TradePilot_RISK_LABEL",OBJPROP_TOOLTIP,help);
 }

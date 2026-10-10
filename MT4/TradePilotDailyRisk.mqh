@@ -271,7 +271,18 @@ bool TPDL_Event(string name)
   TPDC_Render();ChartRedraw();return true;
  }
  if(name!="TradePilot_LIMIT_MODE")return false;
- tpdl_edit_percent=!tpdl_edit_percent;ObjectSetInteger(0,name,OBJPROP_STATE,false);UpdatePanel();return true;
+ double entered=0;if(!TPDL_ReadPending(entered)){ObjectSetInteger(0,name,OBJPROP_STATE,false);return true;}
+ datetime period=GetSessionStartForTime(TPDL_Now());EnsureSessionState(period);
+ double converted=entered==0?0:TPDM_Convert(entered,tpdl_edit_percent?1:0,tpdl_edit_percent?0:1,GetSessionStartBalance(period),0);
+ if(converted<0 || (!tpdl_edit_percent && converted>100)) {
+  ObjectSetInteger(0,name,OBJPROP_STATE,false);Alert("Mode unchanged. Wait for a verified daily starting balance; a percentage loss limit cannot exceed 100%.");return true;
+ }
+ TPDC_Close();tpdl_edit_percent=!tpdl_edit_percent;
+ string converted_text=DoubleToString(converted,8);
+ while(StringLen(converted_text)>0 && StringSubstr(converted_text,StringLen(converted_text)-1)=="0")converted_text=StringSubstr(converted_text,0,StringLen(converted_text)-1);
+ if(StringSubstr(converted_text,StringLen(converted_text)-1)==".")converted_text+="00";
+ ObjectSetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TEXT,entered==0?"":converted_text);
+ ObjectSetInteger(0,name,OBJPROP_STATE,false);UpdatePanel();return true;
 }
 
 bool tpdl_notice_open=false;

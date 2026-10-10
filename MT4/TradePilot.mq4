@@ -2687,43 +2687,34 @@ void OnChartEvent(
    // RISK MODE
    if(sparam == "TradePilot_RISK_MODE_BUTTON")
    {
-      ObjectSetInteger(
-         0,
-         sparam,
-         OBJPROP_STATE,
-         false
-      );
-
-      risk_percentage_mode =
-         !risk_percentage_mode;
-
-      GlobalVariableSet(
-         GV_RISK_MODE,
-         risk_percentage_mode
-         ? 1.0
-         : 0.0
-      );
-
-      ObjectSetString(
-         0,
-         "TradePilot_RISK_MODE_BUTTON",
-         OBJPROP_TEXT,
-         risk_percentage_mode
-         ? "PERCENTAGE"
-         : "MONEY"
-      );
-
-      ObjectSetString(
-         0,
-         "TradePilot_RISK_UNIT",
-         OBJPROP_TEXT,
-         risk_percentage_mode
-         ? "%"
-         : AccountCurrencyText()
-      );
-
-      ChartRedraw();
-      return;
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);
+#ifdef __MQL5__
+      bool was_percent=risk_mode==RISK_PERCENTAGE;
+      double balance=AccountInfoDouble(ACCOUNT_BALANCE);
+#else
+      bool was_percent=risk_percentage_mode;
+      double balance=AccountBalance();
+#endif
+      double entered=TPDR_Number(ObjectGetString(0,"TradePilot_RISK_EDIT",OBJPROP_TEXT));
+      double converted=TPDM_Convert(entered,was_percent?1:0,was_percent?0:1,balance,0);
+      if(!TerminalInfoInteger(TERMINAL_CONNECTED) || converted<=0) {
+         Alert("Risk unchanged. Enter a positive risk and wait for the connected account balance before changing Cash or Percentage.");return;
+      }
+      risk_value=converted;
+#ifdef __MQL5__
+      risk_mode=was_percent?RISK_MONEY:RISK_PERCENTAGE;
+#else
+      risk_percentage_mode=!was_percent;
+      GlobalVariableSet(GV_RISK_MODE,risk_percentage_mode?1:0);
+      GlobalVariableSet(GV_RISK_VALUE,risk_value);
+#endif
+      string converted_text=DoubleToString(converted,8);
+      while(StringLen(converted_text)>0 && StringSubstr(converted_text,StringLen(converted_text)-1)=="0")converted_text=StringSubstr(converted_text,0,StringLen(converted_text)-1);
+      if(StringSubstr(converted_text,StringLen(converted_text)-1)==".")converted_text+="00";
+      ObjectSetString(0,"TradePilot_RISK_EDIT",OBJPROP_TEXT,converted_text);
+      ObjectSetString(0,sparam,OBJPROP_TEXT,was_percent?"CASH":"PERCENTAGE");
+      ObjectSetString(0,sparam,OBJPROP_TOOLTIP,"Change how the same planned risk is entered. For example, 10% of a 500 balance becomes 50 in Cash mode. Uses the current connected broker balance.");
+      TP_SizerRiskEquivalents();UpdatePanel();ChartRedraw();return;
    }
 
 
@@ -2952,10 +2943,10 @@ bool TPM_SpreadRefresh()
 #endif
   if(!MathIsValidNumber(tpm_spread_cash) || tpm_spread_cash<=0)tpm_spread_cash=-1;
  }
- TPM_Widget("SPREAD",OBJ_BUTTON,12,185,132,24,tpm_spread_on?"SPREAD ON":"SPREAD OFF",clrWhite,tpm_spread_on?C'35,115,80':C'140,45,45');
+ TPM_Widget("SPREAD",OBJ_BUTTON,12,181,132,22,tpm_spread_on?"SPREAD ON":"SPREAD OFF",clrWhite,tpm_spread_on?C'35,115,80':C'140,45,45');
  ObjectSetString(0,"TPM_SPREAD",OBJPROP_TOOLTIP,"Use only this chart's broker spread. ON moves this measuring stop one current spread farther from entry and updates its ratio; OFF restores the base measuring stop. Dragging the stop creates a new base. It never changes a broker order or the position sizer's separate spread control.");
- string caption=fresh?"Spread: "+DoubleToString(tpm_spread_price/_Point,1)+" points":"Spread: waiting for broker quote";
- TPM_Widget("SPREAD_INFO",OBJ_LABEL,12,212,0,0,caption,clrWhite,clrNONE);
+ string caption=fresh?DoubleToString(tpm_spread_price/_Point,1)+" points":"Waiting for quote";
+ TPM_Widget("SPREAD_INFO",OBJ_LABEL,160,187,0,0,caption,clrWhite,clrNONE);
  ObjectSetString(0,"TPM_SPREAD_INFO",OBJPROP_TOOLTIP,"The current difference between this chart\'s buying and selling prices, measured in broker points. Spread ON adds this distance to the measuring stop. Waiting means a fresh broker price has not arrived.");
  if(TP_LocalBridge && TP_BridgeToken!="" && TP_AccountId!="") {
   string text="MEASURE\t"+TP_BridgeToken+"\t"+TP_AccountId+"\t"+TP_Login()+"\t"+TP_Server()+"\tMT4\t"+TP_Int(TimeGMT())+"\t"+TP_Int(ChartID())+"\t"+_Symbol+"\t"+(tpm_spread_on?"1":"0")+"\t"+(fresh?"1":"0")+"\t"+TP_Num(tpm_spread_price)+"\t"+TP_Num(_Point>0?tpm_spread_price/_Point:0)+"\t"+TP_Num(tpm_spread_cash)+"\t"+AccountInfoString(ACCOUNT_CURRENCY)+"\t"+TP_Num(tpm_prices[0])+"\t"+TP_Num(tpm_prices[1])+"\t"+TP_Num(tpm_prices[2])+"\t"+TimeToString(TPDL_Now(),TIME_DATE|TIME_SECONDS)+"\r\n";
@@ -2969,7 +2960,7 @@ void TPM_Render()
    tpm_scale = panel_scale;
    long width = ChartGetInteger(0, CHART_WIDTH_IN_PIXELS);
    if(width > TPM_X()+12) tpm_scale = MathMin(tpm_scale, (double)(width-TPM_X()-12)/304.0);
-   TPM_Widget("BG", OBJ_RECTANGLE_LABEL, 0, 0, 304, tpm_on ? ((tpm_prices[1]<tpm_prices[0] && tpm_prices[2]>tpm_prices[0]) || (tpm_prices[1]>tpm_prices[0] && tpm_prices[2]<tpm_prices[0]) ? 302 : 322) : 31, "", clrSlateGray, C'24,29,39');
+   TPM_Widget("BG", OBJ_RECTANGLE_LABEL, 0, 0, 304, tpm_on ? 275 : 31, "", clrSlateGray, C'24,29,39');
    TPM_Widget("TITLE", OBJ_LABEL, 12, 8, 0, 0, "POINT MEASURER", C'90,180,255', clrNONE, 10);
    if(tpm_on)TPM_Widget("SUBTITLE",OBJ_LABEL,12,27,0,0,"Measurement only",clrWhite,clrNONE);
    else ObjectDelete(0,"TPM_SUBTITLE");
@@ -2979,33 +2970,39 @@ void TPM_Render()
    if(!tpm_on) return;
    bool ready = TPM_EnsureLines();
    if(ready) {ready=TPM_SpreadRefresh();TPM_EnsureLines();}
-   for(int i=0; i<3; i++)
-      TPM_Widget("PRICE_"+IntegerToString(i), OBJ_LABEL, 12, 49+i*22, 0, 0,
-         tpm_names[i]+"   "+(ready ? DoubleToString(tpm_prices[i], _Digits) : "waiting for price"), tpm_colors[i], clrNONE);
+   for(int i=0; i<3; i++) {
+      TPM_Widget("PRICE_"+IntegerToString(i)+"_LABEL",OBJ_LABEL,12,49+i*22,0,0,tpm_names[i],tpm_colors[i],clrNONE);
+      TPM_Widget("PRICE_"+IntegerToString(i),OBJ_LABEL,160,49+i*22,0,0,ready?DoubleToString(tpm_prices[i],_Digits):"Waiting for price",tpm_colors[i],clrNONE);
+   }
    double sl = MathAbs(tpm_prices[0]-tpm_prices[1]);
    double tp = MathAbs(tpm_prices[2]-tpm_prices[0]);
    bool valid = ready && sl > _Point*0.01 && _Point > 0.0;
    double rr = valid ? tp/sl : 0.0;
-   TPM_Widget("SL_DIST", OBJ_LABEL, 12, 116, 0, 0, "SL   "+(ready ? TPM_Distance(sl) : "n/a"), clrWhite, clrNONE);
-   TPM_Widget("TP_DIST", OBJ_LABEL, 12, 138, 0, 0, "TP   "+(ready ? TPM_Distance(tp) : "n/a"), clrWhite, clrNONE);
-   TPM_Widget("RR", OBJ_LABEL, 12, 163, 0, 0, "R:R   "+(valid ? "1 : "+DoubleToString(rr,2) : "n/a (zero SL / no price)"), clrWhite, clrNONE, 10);
-   TPM_Widget("RISK_CAPTION", OBJ_LABEL, 12, 240, 0, 0, "Risk", clrSilver, clrNONE);
-   TPM_Widget("RISK", OBJ_EDIT, 53, 234, 108, 26, DoubleToString(tpm_risk,2), clrWhite, C'37,44,57');
-   TPM_Widget("PERCENT", OBJ_BUTTON, 170, 234, 42, 26, "%", clrWhite, tpm_percent ? C'35,115,80' : C'65,70,80');
-   TPM_Widget("CASH", OBJ_BUTTON, 219, 234, 73, 26, "CASH", clrWhite, tpm_percent ? C'65,70,80' : C'35,115,80');
+   TPM_Widget("SL_DIST_LABEL",OBJ_LABEL,12,115,0,0,"SL",clrWhite,clrNONE);
+   TPM_Widget("SL_DIST", OBJ_LABEL, 160, 115, 0, 0, (ready ? TPM_Distance(sl) : "n/a"), clrWhite, clrNONE);
+   TPM_Widget("TP_DIST_LABEL",OBJ_LABEL,12,137,0,0,"TP",clrWhite,clrNONE);
+   TPM_Widget("TP_DIST", OBJ_LABEL, 160, 137, 0, 0, (ready ? TPM_Distance(tp) : "n/a"), clrWhite, clrNONE);
+   TPM_Widget("RR_LABEL",OBJ_LABEL,12,159,0,0,"R:R",clrWhite,clrNONE);
+   TPM_Widget("RR", OBJ_LABEL, 160, 159, 0, 0, (valid ? "1 : "+DoubleToString(rr,2) : "Not available"), clrWhite, clrNONE, 10);
+   TPM_Widget("RISK_CAPTION", OBJ_LABEL, 12, 215, 0, 0, "Risk", clrSilver, clrNONE);
+   TPM_Widget("RISK", OBJ_EDIT, 160, 209, 54, 22, DoubleToString(tpm_risk,2), clrWhite, C'37,44,57');
+   TPM_Widget("PERCENT", OBJ_BUTTON, 220, 209, 28, 22, "%", clrWhite, tpm_percent ? C'35,115,80' : C'65,70,80');
+   TPM_Widget("CASH", OBJ_BUTTON, 254, 209, 38, 22, "CASH", clrWhite, tpm_percent ? C'65,70,80' : C'35,115,80');
    string unit = tpm_percent ? "%" : AccountInfoString(ACCOUNT_CURRENCY);
    bool opposite = (tpm_prices[1]<tpm_prices[0] && tpm_prices[2]>tpm_prices[0]) ||
                    (tpm_prices[1]>tpm_prices[0] && tpm_prices[2]<tpm_prices[0]);
    color potential_color=ready?(opposite?C'35,115,80':C'140,45,45'):clrSilver;
    color potential_font=ready?(opposite?tpm_colors[2]:tpm_colors[1]):clrSilver;
-   TPM_Widget("RETURN_BORDER",OBJ_RECTANGLE_LABEL,8,266,288,28,"",potential_color,C'24,29,39');
+   TPM_Widget("RETURN_BORDER",OBJ_RECTANGLE_LABEL,8,239,288,28,"",potential_color,C'24,29,39');
    ObjectSetInteger(0,"TPM_RETURN_BORDER",OBJPROP_BORDER_COLOR,potential_color);
-   TPM_Widget("RETURN", OBJ_LABEL, 12, 273, 0, 0, "POTENTIAL   "+(valid ? DoubleToString(rr*tpm_risk,2)+" "+unit : "n/a"), potential_font, clrNONE, 10);
+   TPM_Widget("RETURN_LABEL",OBJ_LABEL,12,246,0,0,"POTENTIAL",potential_font,clrNONE);
+   TPM_Widget("RETURN", OBJ_LABEL, 160, 246, 0, 0, (valid ? DoubleToString(rr*tpm_risk,2)+" "+unit : "n/a"), potential_font, clrNONE, 10);
    ObjectSetString(0,"TPM_RETURN",OBJPROP_TOOLTIP,"Potential is the measured target value. Green means entry is between Stop Loss and Take Profit. Red means both lines are on the same side of entry, so this is not a valid profit-and-loss layout. Move one line across entry. This is a measurement, not a realised trading loss.");
 
-   ObjectSetInteger(0,"TPM_BG",OBJPROP_YSIZE,TPM_S(ready && !opposite?322:302));
-   if(ready && !opposite)TPM_Widget("NOTE", OBJ_LABEL, 12, 300, 0, 0, "SL/TP not opposite entry; distance ratio only", clrSilver, clrNONE);
-   else ObjectDelete(0,"TPM_NOTE");
+   ObjectSetInteger(0,"TPM_BG",OBJPROP_YSIZE,TPM_S(275));
+   ObjectDelete(0,"TPM_NOTE");
+   string aligned_keys[7]={"PRICE_0","PRICE_1","PRICE_2","SL_DIST","TP_DIST","RR","RETURN"};
+   for(int help_index=0;help_index<7;help_index++)ObjectSetString(0,"TPM_"+aligned_keys[help_index]+"_LABEL",OBJPROP_TOOLTIP,ObjectGetString(0,"TPM_"+aligned_keys[help_index],OBJPROP_TOOLTIP));
 
 }
 
@@ -3090,8 +3087,8 @@ void TPDC_Render()
  double reviewed_wins=0,reviewed_losses=0;TPDA_Closed(tpdc_period,reviewed_wins,reviewed_losses);
  string review_currency=AccountInfoString(ACCOUNT_CURRENCY);
  bool review_wins=tpdc_loss?tp_limit_wins:tp_daily_wins,review_losses=tpdc_loss?tp_limit_losses:tp_daily_losses;
- string win_review="Apply wins: "+(review_wins?"ON "+review_currency+" "+DoubleToString(reviewed_wins,2):"OFF");
- string loss_review="Apply losses: "+(review_losses?"ON "+review_currency+" "+DoubleToString(MathAbs(reviewed_losses),2):"OFF");
+ string win_review="Apply wins: "+(review_wins?"ON "+TPDM_ReviewAmount(reviewed_wins,tpdc_loss,tpdc_period,review_currency):"OFF");
+ string loss_review="Apply losses: "+(review_losses?"ON "+TPDM_ReviewAmount(MathAbs(reviewed_losses),tpdc_loss,tpdc_period,review_currency):"OFF");
  CreateLabel("TradePilot_DAILY_CONFIRM_WINS",win_review,x+S(12),y+S(38),TP_HeaderFont(win_review,FontSize(BASE_FONT_NORMAL),S(252),S(16)),clrWhite);
  CreateLabel("TradePilot_DAILY_CONFIRM_LOSSES",loss_review,x+S(12),y+S(58),TP_HeaderFont(loss_review,FontSize(BASE_FONT_NORMAL),S(252),S(16)),clrWhite);
 

@@ -20,7 +20,7 @@ void TPP_Widget(string key,ENUM_OBJECT type,int x,int y,int w,int h,string text,
    ObjectSetInteger(0,name,OBJPROP_TIMEFRAMES,OBJ_ALL_PERIODS);
    ObjectSetInteger(0,name,OBJPROP_CORNER,CORNER_LEFT_UPPER);
    ObjectSetInteger(0,name,OBJPROP_XDISTANCE,TPM_X()+TPM_S(x));
-   ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+TPM_S((tpm_on ? 374 : 39)+y));
+   ObjectSetInteger(0,name,OBJPROP_YDISTANCE,PanelY()+TPM_S((tpm_on ? 283 : 39)+y));
    ObjectSetInteger(0,name,OBJPROP_COLOR,key=="TITLE"?C'90,180,255':clrWhite);
    ObjectSetInteger(0,name,OBJPROP_BACK,false);
    ObjectSetInteger(0,name,OBJPROP_SELECTABLE,false);
@@ -90,21 +90,22 @@ void TPP_Render()
    static string prior_view="";string view=tpp_picker!=""?"calendar":"fields";
    if(view!=prior_view){TPP_Visibility("TPP_",false);prior_view=view;}
    if(tpp_picker!="") { TPP_Calendar();return; }
-   TPP_Widget("TYPE",OBJ_BUTTON,12,33,280,25,tpp_types[tpp_type],"Click to choose Buy Limit, Sell Limit, Buy Stop or Sell Stop.");
+   TPP_Widget("TYPE_LABEL",OBJ_LABEL,12,37,0,0,"Order type","Choose the broker pending-order type.");
+   TPP_Widget("TYPE",OBJ_BUTTON,160,33,132,25,tpp_types[tpp_type],"Click to choose Buy Limit, Sell Limit, Buy Stop or Sell Stop.");
    string keys[4]={"VOLUME","ENTRY","SL","TP"};
    string labels[4]={"Volume (lots)","At price","Stop Loss","Take Profit"};
    string values[4]={"0.01","","0","0"};
    values[0]=DoubleToString(SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MIN),8);
    for(int i=0;i<4;i++) {
       TPP_Widget(keys[i]+"_LABEL",OBJ_LABEL,12,66+i*29,0,0,labels[i],i==0 ? "Order volume in lots. It must follow the broker minimum, maximum and volume step; available margin is checked separately." : i==1 ? "Entry price that triggers the selected pending-order type after placement; use this chart symbol price." : i==2 ? "Stop-loss price for the pending trade. Enter 0 to omit; a missing stop can prevent risk-based copying." : "Take-profit price for the pending trade. Enter 0 to omit.");
-      TPP_Widget(keys[i],OBJ_EDIT,150,62+i*29,142,25,values[i],i==0 ? "Broker lot size, for example 0.01. Must match the symbol volume step." : i==1 ? "The price that triggers this pending order. Use the chart symbol price." : "Optional broker price. Enter 0 to omit this protection.");
+      TPP_Widget(keys[i],OBJ_EDIT,160,62+i*29,132,25,values[i],i==0 ? "Broker lot size, for example 0.01. Must match the symbol volume step." : i==1 ? "The price that triggers this pending order. Use the chart symbol price." : "Optional broker price. Enter 0 to omit this protection.");
    }
-   TPP_Widget("PLACE_LABEL",OBJ_LABEL,12,184,0,0,"Place at","Optional scheduled placement time in broker time.");
-   TPP_Widget("PLACE",OBJ_BUTTON,100,179,192,25,tpp_place_text,"Click for the broker calendar and hour/minute selectors. Now means immediate placement. Terminal and trading permissions must stay on. More than 10 seconds late fails without submitting.");
-   TPP_Widget("EXPIRY_LABEL",OBJ_LABEL,12,213,0,0,"Expiry","Optional expiry of the broker pending order.");
-   TPP_Widget("EXPIRY",OBJ_BUTTON,100,208,192,25,tpp_expiry_text,"Click for the broker calendar and hour/minute selectors. No expiry is an explicit choice. Selected expiry must be after placement. Unsupported expiry is rejected, never silently removed.");
-   TPP_Widget("PLACE_BUTTON",OBJ_BUTTON,12,240,172,26,tpp_at>0 ? "Scheduled" : "Place / Schedule","Submit now or schedule the entered pending order. A broker pending order executes only when its price condition is met.");
-   TPP_Widget("CANCEL",OBJ_BUTTON,194,240,98,26,"Cancel plan","Cancel this local scheduled placement. Existing broker orders remain unchanged.");
+   TPP_Widget("PLACE_LABEL",OBJ_LABEL,12,182,0,0,"Place at","Optional scheduled placement time in broker time.");
+   TPP_Widget("PLACE",OBJ_BUTTON,160,178,132,25,tpp_place_text,"Click for the broker calendar and hour/minute selectors. Now means immediate placement. Terminal and trading permissions must stay on. More than 10 seconds late fails without submitting.");
+   TPP_Widget("EXPIRY_LABEL",OBJ_LABEL,12,211,0,0,"Expiry","Optional expiry of the broker pending order.");
+   TPP_Widget("EXPIRY",OBJ_BUTTON,160,207,132,25,tpp_expiry_text,"Click for the broker calendar and hour/minute selectors. No expiry is an explicit choice. Selected expiry must be after placement. Unsupported expiry is rejected, never silently removed.");
+   TPP_Widget("PLACE_BUTTON",OBJ_BUTTON,12,240,132,26,tpp_at>0 ? "Scheduled" : "Place / Schedule","Submit now or schedule the entered pending order. A broker pending order executes only when its price condition is met.");
+   TPP_Widget("CANCEL",OBJ_BUTTON,160,240,132,26,"Cancel plan","Cancel this local scheduled placement. Existing broker orders remain unchanged.");
    TPP_Widget("STATUS",OBJ_LABEL,12,273,0,0,StringSubstr(tpp_note=="Ready - broker time" ? "Broker "+TimeToString(TimeCurrent(),TIME_DATE|TIME_SECONDS) : tpp_note,0,38),tpp_note);
 }
 string TPP_Text(string key) { string s=ObjectGetString(0,"TPP_"+key,OBJPROP_TEXT); StringTrimLeft(s);StringTrimRight(s);return s; }

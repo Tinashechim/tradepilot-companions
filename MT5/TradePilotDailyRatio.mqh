@@ -1,5 +1,6 @@
 #ifndef TRADEPILOT_DAILY_RATIO
 #define TRADEPILOT_DAILY_RATIO
+#include "TradePilotModeConversion.mqh"
 string TPDR_Inline(string primary,string second,string third)
 {
  StringReplace(second,"Percentage: ","");StringReplace(second,"Cash: ","");StringReplace(second,"Ratio: ","");
@@ -73,19 +74,28 @@ bool TPDR_Event(string name)
  int mode=TPDR_Enabled()?2:(daily_percentage_mode?1:0);
 #endif
  int next=mode==1?0:mode==0?2:1;
+ datetime period=GetSessionStartForTime(TPDL_Now());EnsureSessionState(period);
+ double entered=TPDR_Parse(ObjectGetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT));
+ double converted=TPDM_Convert(entered,mode,next,GetSessionStartBalance(period),TPDR_RiskCash());
+ if(converted<=0 || (next==2 && converted>1000000)) {
+  ObjectSetInteger(0,name,OBJPROP_STATE,false);
+  Alert("Mode unchanged. Enter a positive target and wait for the verified daily starting balance and Position Sizer risk before converting modes.");return true;
+ }
+ // Change the displayed draft, never reinterpret the previous number in a new mode.
+ TPDC_Close();
  GlobalVariableSet(GV_DAILY_MODE+"_RATIO",next==2?1:0);
  GlobalVariableSet(GV_DAILY_MODE,next==1?1:0);
 #ifdef __MQL5__
- if(next==2)GlobalVariableSet(GV_DAILY_TARGET,2);
- double value=GetDailyTargetValue();
+ GlobalVariableSet(GV_DAILY_TARGET,converted);
 #else
  daily_percentage_mode=next==1;
- if(next==2)GlobalVariableSet(GV_DAILY_VALUE,2);
- daily_target_value=GlobalVariableGet(GV_DAILY_VALUE);double value=daily_target_value;
+ GlobalVariableSet(GV_DAILY_VALUE,converted);daily_target_value=converted;
 #endif
- datetime period=GetSessionStartForTime(TPDL_Now());EnsureSessionState(period);
- // Mode selection edits the form only. Update confirmation saves the active period.
- ObjectSetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT,DoubleToString(value,2));
+ string converted_text=DoubleToString(converted,8);
+ while(StringLen(converted_text)>0 && StringSubstr(converted_text,StringLen(converted_text)-1)=="0")converted_text=StringSubstr(converted_text,0,StringLen(converted_text)-1);
+ if(StringSubstr(converted_text,StringLen(converted_text)-1)==".")converted_text+="00";
+ ObjectSetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT,next==2?"1:"+converted_text:converted_text);
+ ObjectSetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TOOLTIP,"Switches Cash, Percentage and Ratio while keeping the same planned cash target. Update reviews and saves the converted target.");
  ObjectSetInteger(0,name,OBJPROP_STATE,false);UpdatePanel();return true;
 }
 
@@ -148,4 +158,14 @@ void TPDR_BudgetEquivalents(datetime period,double remaining,bool verified,bool 
  if(ObjectFind(0,"TradePilot_LIMIT_OTHER")>=0)ObjectDelete(0,"TradePilot_LIMIT_OTHER");
 }
 
+string TPDM_ReviewAmount(double amount,bool loss_section,datetime period,string currency)
+{
+ double balance=GetSessionStartBalance(period),risk=loss_section?TPDR_SavedRisk(period):TPDR_RiskCash();
+ string cash=currency+" "+DoubleToString(amount,2);
+ string percent=balance>0?DoubleToString(amount/balance*100.0,2)+"%":"Percentage pending";
+ string ratio=risk>0?DoubleToString(amount/risk,2)+"R":"Ratio pending";
+ bool percentage=loss_section?tpdl_edit_percent:GlobalVariableGet(GV_DAILY_MODE)>0.5;
+ if(!loss_section && TPDR_Enabled())return ratio+" ("+cash+"; "+percent+")";
+ return percentage?percent+" ("+cash+"; "+ratio+")":cash+" ("+percent+"; "+ratio+")";
+}
 #endif

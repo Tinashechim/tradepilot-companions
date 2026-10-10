@@ -63,6 +63,8 @@ SETTINGS — AUTOMATIC EMAIL NOTIFICATIONS
 SETTINGS TABS
 SIZING EXPLANATIONS AND ADMIN EMAIL CHOICES
 POSITION SIZER RISK ROW
+DAILY MODE CONVERSION AND MEASURING LAYOUT
+POSITION SIZER MODE CONVERSION
 POSITION SIZER RISK EQUIVALENTS
 EXECUTED TRADES
 DAILY LOSS LIMITS
@@ -399,6 +401,16 @@ Calculated lots display two decimal places on both platforms; broker lot-step pr
 
 POSITION SIZER RISK ROW
 The Risk input starts in the same column as Entry Price and Stop Loss. The selected percentage or cash amount stays editable, and the other equivalents appear immediately beside it in brackets. Percentage uses the current connected broker balance. Cash uses the account currency; 1R is that entered cash risk. Changing these values does not grant trading permission.
+
+
+DAILY MODE CONVERSION AND MEASURING LAYOUT
+Changing Daily Performance Cash, Percentage or Ratio converts the entered draft while preserving its planned cash amount. For example, 10% of a 500 broker-day starting balance becomes 50 in Cash mode; with planned risk of 5, it becomes 1:10 in Ratio mode. Daily Loss Limit converts its Cash and Percentage input the same way. Empty No daily limit stays empty. Missing verified balance or risk prevents conversion and leaves the mode unchanged. Update or Enter still reviews and saves the draft; choosing a mode does not change trading permissions or saved limits.
+When Apply Wins or Apply Losses is ON, the review shows the applied amount in that section’s selected mode followed by the other two equivalents in brackets. OFF remains clearly marked OFF.
+Point Measurer and Pending Order use matching left-label and right-value columns. Point Measurer no longer adds a message below Potential when both measuring lines are on the same side of entry; its existing colour and hover explanation remain. Consistent row gaps and compact panel spacing keep Pending Order directly below Point Measurer.
+
+
+POSITION SIZER MODE CONVERSION
+The Position Sizer Cash/Percentage mode selector converts the entered risk using the current connected broker balance. For example, 10% of a 500 balance becomes 50 in Cash mode and converts back to 10%. The planned cash risk remains the same at the moment of switching. The bracketed equivalents refresh immediately. If the balance or entered risk cannot be verified, the mode and input stay unchanged. The 1R equivalent means the entered planned cash risk; it is not a separate Position Sizer input mode. Daily Performance has its own risk-to-reward target mode.
 
 
 POSITION SIZER RISK EQUIVALENTS

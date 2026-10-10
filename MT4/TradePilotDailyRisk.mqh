@@ -27,33 +27,43 @@ bool TPDL_Totals(double &closed,double &floating,double &adjusted)
  closed=0;floating=0;adjusted=0;
  datetime period=GetSessionStartForTime(TPDL_Now());
  #ifdef __MQL5__
- if(!HistorySelect(period,TPDL_Now())) return false;
-
- for(int i=0;i<HistoryDealsTotal();i++) {
-  ulong ticket=HistoryDealGetTicket(i);if(ticket==0) return false;
-  long type=HistoryDealGetInteger(ticket,DEAL_TYPE);
-  if(type!=DEAL_TYPE_BUY && type!=DEAL_TYPE_SELL && type!=DEAL_TYPE_COMMISSION && type!=DEAL_TYPE_COMMISSION_DAILY && type!=DEAL_TYPE_COMMISSION_MONTHLY && type!=DEAL_TYPE_COMMISSION_AGENT_DAILY && type!=DEAL_TYPE_COMMISSION_AGENT_MONTHLY) continue;
-  double net=HistoryDealGetDouble(ticket,DEAL_PROFIT)+HistoryDealGetDouble(ticket,DEAL_COMMISSION)+HistoryDealGetDouble(ticket,DEAL_SWAP)+HistoryDealGetDouble(ticket,DEAL_FEE);
-  if(!MathIsValidNumber(net)) return false;
-  closed+=net;
+ // Resolve original entry from complete history, including positions closed today.
+ if(!HistorySelect(0,TPDL_Now()))return false;
+ int expected=HistoryDealsTotal()+PositionsTotal();if(expected>1000000)return false;
+ int capacity=16;while(capacity<expected*2+1)capacity*=2;
+ ulong ids[];bool used[];datetime born[];double realised[],open_result[];
+ if(ArrayResize(ids,capacity)<0||ArrayResize(used,capacity)<0||ArrayResize(born,capacity)<0||ArrayResize(realised,capacity)<0||ArrayResize(open_result,capacity)<0)return false;
+ ArrayInitialize(used,false);ArrayInitialize(born,0);ArrayInitialize(realised,0);ArrayInitialize(open_result,0);
+ for(int i=0;i<HistoryDealsTotal();i++){
+  ulong ticket=HistoryDealGetTicket(i);if(ticket==0)return false;
+  long type=HistoryDealGetInteger(ticket,DEAL_TYPE);if(type!=DEAL_TYPE_BUY&&type!=DEAL_TYPE_SELL)continue;
+  ulong id=(ulong)HistoryDealGetInteger(ticket,DEAL_POSITION_ID);if(id==0)return false;
+  int slot=TP_BasketSlot(id,ids,used);if(slot<0)return false;
+  datetime stamp=(datetime)HistoryDealGetInteger(ticket,DEAL_TIME);
+  long entry=HistoryDealGetInteger(ticket,DEAL_ENTRY);
+  if((entry==DEAL_ENTRY_IN||entry==DEAL_ENTRY_INOUT)&&(born[slot]==0||stamp<born[slot]))born[slot]=stamp;
+  double value=HistoryDealGetDouble(ticket,DEAL_PROFIT)+HistoryDealGetDouble(ticket,DEAL_COMMISSION)+HistoryDealGetDouble(ticket,DEAL_SWAP)+HistoryDealGetDouble(ticket,DEAL_FEE);
+  if(!MathIsValidNumber(value))return false;
+  if(stamp>=period)realised[slot]+=value;
  }
- for(int i=0;i<PositionsTotal();i++) {
-  if(PositionGetTicket(i)==0) return false;
-  double net=PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP);
-  if(!MathIsValidNumber(net)) return false;
-  floating+=net;
+ for(int i=0;i<PositionsTotal();i++){
+  if(PositionGetTicket(i)==0)return false;
+  int slot=TP_BasketSlot((ulong)PositionGetInteger(POSITION_IDENTIFIER),ids,used);if(slot<0)return false;
+  datetime stamp=(datetime)PositionGetInteger(POSITION_TIME);if(born[slot]==0||stamp<born[slot])born[slot]=stamp;
+  double value=PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP);if(!MathIsValidNumber(value))return false;open_result[slot]+=value;
  }
+ for(int i=0;i<capacity;i++)if(used[i]&&born[i]>0&&GetSessionStartForTime(born[i])==period){closed+=realised[i];floating+=open_result[i];}
 #else
  if(!TP_HistoryReady()) return false;
  for(int i=0;i<OrdersHistoryTotal();i++) {
   if(!OrderSelect(i,SELECT_BY_POS,MODE_HISTORY)) return false;
-  if((OrderType()!=OP_BUY && OrderType()!=OP_SELL) || OrderCloseTime()<period) continue;
+  if((OrderType()!=OP_BUY && OrderType()!=OP_SELL) || OrderCloseTime()<period || GetSessionStartForTime(OrderOpenTime())!=period) continue;
   double net=OrderProfit()+OrderCommission()+OrderSwap();if(!MathIsValidNumber(net)) return false;
   closed+=net;if(GetSessionStartForTime(OrderOpenTime())==period && TP_DailyInclude(period,net)) adjusted+=net;
  }
  for(int i=0;i<OrdersTotal();i++) {
   if(!OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) return false;
-  if(OrderType()!=OP_BUY && OrderType()!=OP_SELL) continue;
+  if((OrderType()!=OP_BUY && OrderType()!=OP_SELL) || GetSessionStartForTime(OrderOpenTime())!=period) continue;
   double net=OrderProfit()+OrderCommission()+OrderSwap();if(!MathIsValidNumber(net)) return false;
   floating+=net;if(GetSessionStartForTime(OrderOpenTime())==period && TP_DailyInclude(period,net)) adjusted+=net;
  }
@@ -71,7 +81,7 @@ bool TPDL_State(double &net,double &remaining,bool &blocked)
   net-=wins+losses;net+=(TPDA_Flag(GetSessionStartForTime(TPDL_Now()),"LIMIT_WINS")?wins:0)+(TPDA_Flag(GetSessionStartForTime(TPDL_Now()),"LIMIT_LOSSES")?losses:0);
  }
  remaining=cash>0 ? MathMax(0,cash+net) : -1;
- string key=TPDL_DayKey("HIT");blocked=GlobalVariableCheck(key) && GlobalVariableGet(key)>0;
+ string key=TPDL_DayKey("COHORT_HIT");blocked=GlobalVariableCheck(key) && GlobalVariableGet(key)>0;
  if(cash>0 && verified && net<=-cash) {GlobalVariableSet(key,1);blocked=true;}
  if(cash<=0) blocked=false;
  return verified;
@@ -110,7 +120,7 @@ bool TPDL_EntryAllowed(string &reason)
  if(!MathIsValidNumber(TPDL_Cash()) || TPDL_Cash()<=0) {reason="Daily loss limit starting balance is not available. Wait for a verified broker balance.";return false;}
  double net=0,remaining=0;bool blocked=false;
  if(!TPDL_State(net,remaining,blocked)) {reason="Daily loss budget not verified. Wait for complete broker history; existing positions remain open.";return false;}
- if(blocked) {reason="Daily loss limit reached. Change the daily limit or wait for the next broker period (23:30). Existing positions remain open.";return false;}
+ if(blocked) {reason="Daily loss limit reached. Review Current Basket and your saved daily limit, or wait for renewal at 23:30 broker time. Existing positions remain open.";return false;}
  return true;
 }
 void TPDL_Publish()
@@ -179,7 +189,7 @@ void TPDL_Render()
  ObjectSetInteger(0,"TradePilot_LIMIT_REMAIN",OBJPROP_ANCHOR,ANCHOR_LEFT_UPPER);
  ObjectSetInteger(0,"TradePilot_LIMIT_REMAIN",OBJPROP_XDISTANCE,ValueX());
  TPDR_BudgetEquivalents(GetSessionStartForTime(TPDL_Now()),displayed_budget,verified,TPDL_Limit()>0,currency,tpdl_edit_percent);
- ObjectSetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TOOLTIP,"Optional daily loss limit. Leave blank for no daily entry limit. Percentage uses the broker-period starting balance; cash uses account currency. Includes all open floating results and net closed results since 23:30.");
+ ObjectSetString(0,"TradePilot_LIMIT_EDIT",OBJPROP_TOOLTIP,"Optional daily loss limit. Leave blank for no daily entry limit. Percentage uses the broker-period starting balance; cash uses account currency. Renews at 23:30 broker time. Counts only trades entered in the current broker period, including their floating results and net charges. Older baskets are excluded.");
  ObjectSetString(0,"TradePilot_LIMIT_MODE",OBJPROP_TOOLTIP,"Choose Percentage or Cash, then press Update under Daily Performance to save. Editing alone does not change the active limit.");
  string reason="";if(!TPDL_EntryAllowed(reason)) {
   ObjectSetString(0,"TradePilot_BUY_BUTTON",OBJPROP_TOOLTIP,reason);ObjectSetString(0,"TradePilot_SELL_BUTTON",OBJPROP_TOOLTIP,reason);
@@ -235,7 +245,7 @@ bool TPDL_SavePending(bool removal_confirmed=false)
  if(!removal_confirmed && before>0 && value==0 && MessageBox("Removing the daily loss limit allows new entries without this overtrading guard. Continue?","Remove daily limit?",MB_YESNO|MB_ICONWARNING)!=IDYES) return false;
  if(before==value && before_percent==tpdl_edit_percent) return true;
  if(!TPDL_Audit(before,before_percent,value,tpdl_edit_percent)) {Alert("Daily limit unchanged: its audit record could not be saved. Check the terminal file error in Experts.");return false;}
- GlobalVariableSet(TPDL_Key("LIMIT"),value);GlobalVariableSet(TPDL_Key("PERCENT"),tpdl_edit_percent?1:0);GlobalVariableDel(TPDL_DayKey("HIT"));GlobalVariablesFlush();
+ GlobalVariableSet(TPDL_Key("LIMIT"),value);GlobalVariableSet(TPDL_Key("PERCENT"),tpdl_edit_percent?1:0);GlobalVariableDel(TPDL_DayKey("COHORT_HIT"));GlobalVariablesFlush();
  TPDL_Render();return true;
 }
 bool TPDL_Event(string name)
@@ -262,5 +272,34 @@ bool TPDL_Event(string name)
  }
  if(name!="TradePilot_LIMIT_MODE")return false;
  tpdl_edit_percent=!tpdl_edit_percent;ObjectSetInteger(0,name,OBJPROP_STATE,false);UpdatePanel();return true;
+}
+
+bool tpdl_notice_open=false;
+string tpdl_notice_reason="";
+void TPDL_NoticeRender()
+{
+ if(!tpdl_notice_open)return;
+ int x=PanelX()+PanelWidth()+S(24),y=PanelY()+S(55),w=S(300);
+ CreateRectangle("TradePilot_LIMIT_NOTICE_BG",x,y,w,S(168),C'25,30,40',C'85,95,110');
+ CreateLabel("TradePilot_LIMIT_NOTICE_TITLE","Daily loss limit reached",x+S(12),y+S(12),FontSize(BASE_FONT_NORMAL),C'255,100,100');
+ string lines[]={"This trade was not sent.","Review Daily Loss Limit and Current Basket.","Wait for renewal at 23:30 broker time.","Carried-over trades stay in older baskets."};
+ for(int i=0;i<4;i++)CreateLabel("TradePilot_LIMIT_NOTICE_LINE"+IntegerToString(i),lines[i],x+S(12),y+S(38+i*20),TP_HeaderFont(lines[i],FontSize(BASE_FONT_NORMAL),S(276),S(16)),clrWhite);
+ ObjectSetString(0,"TradePilot_LIMIT_NOTICE_TITLE",OBJPROP_TOOLTIP,tpdl_notice_reason);
+ CreateButton("TradePilot_LIMIT_NOTICE_CLOSE","OK",x+S(12),y+S(132),S(90),S(22),C'55,60,70');
+ ObjectSetInteger(0,"TradePilot_LIMIT_NOTICE_CLOSE",OBJPROP_ZORDER,100);
+ ObjectSetString(0,"TradePilot_LIMIT_NOTICE_CLOSE",OBJPROP_TOOLTIP,"Dismiss this notice. No order is sent and no daily settings are changed.");
+}
+void TPDL_Notify(string reason)
+{
+ double net=0,remaining=0;bool blocked=false;
+ if(!TPDL_State(net,remaining,blocked)||!blocked){Alert(reason);return;}
+ TP_SpreadTradeClose();TPC_Close();TPDC_Close();
+ tpdl_notice_reason=reason;tpdl_notice_open=true;TPDL_NoticeRender();ChartRedraw();
+}
+bool TPDL_NoticeEvent(string name)
+{
+ if(!tpdl_notice_open)return false;
+ if(name=="TradePilot_LIMIT_NOTICE_CLOSE"){tpdl_notice_open=false;ObjectsDeleteAll(0,"TradePilot_LIMIT_NOTICE_");ChartRedraw();}
+ return true;
 }
 #endif

@@ -1805,6 +1805,15 @@ void CalculatePositionSize()
 
    double risk_amount =
       TPDL_CapRisk(GetRiskAmount());
+   if(risk_amount<=0 && TPDL_Limit()>0){
+      string reason="";if(!TPDL_EntryAllowed(reason)){
+         ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TEXT,"Daily budget blocked");
+         ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TOOLTIP,reason);
+         ObjectSetInteger(0,"TradePilot_SIZE_VALUE",OBJPROP_COLOR,C'255,100,100');
+         ObjectSetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TEXT,"Not calculated");return;
+      }
+   }
+
 
    ENUM_ORDER_TYPE order_type =
       stop < entry
@@ -1841,9 +1850,10 @@ void CalculatePositionSize()
 
 void ExecutePanelTrade(ENUM_ORDER_TYPE order_type,bool spread_confirmed=false)
 {
+   string daily_reason="";if(!TPDL_EntryAllowed(daily_reason)) {TPDL_Notify(daily_reason);return;}
    if(!tp_spread_on && !spread_confirmed){tp_spread_pending_calculation=false;tp_spread_pending_side=(int)order_type;tp_spread_confirm_open=true;TP_SpreadTradePrompt();return;}
 
-   string daily_reason="";if(!TPDL_EntryAllowed(daily_reason)) {Alert(daily_reason);return;}
+
 
    MqlTick tick;
 
@@ -1982,7 +1992,7 @@ void ExecutePanelTrade(ENUM_ORDER_TYPE order_type,bool spread_confirmed=false)
    trade.SetDeviationInPoints(10);
    trade.SetTypeFillingBySymbol(_Symbol);
 
-   if(!TPDL_EntryAllowed(daily_reason) || !TPDL_AcceptRisk(volume*planned_loss_per_lot,daily_reason)) {Alert(daily_reason);return;}
+   if(!TPDL_EntryAllowed(daily_reason) || !TPDL_AcceptRisk(volume*planned_loss_per_lot,daily_reason)) {TPDL_Notify(daily_reason);return;}
    double tp_master_balance = AccountInfoDouble(ACCOUNT_BALANCE);
    bool sent = false;
 
@@ -2847,7 +2857,7 @@ void RebuildResponsivePanel()
    TPDL_ClosedSummary();
    TPDL_FinalStatus();
    TPDA_LimitButtons();TPDA_PerformanceRows();
-   TPC_Render();TPDC_Render();
+   TPC_Render();TPDC_Render();TPDL_NoticeRender();
    TP_BasketColumnLayout();
    TP_PanelVisibility();
    ChartRedraw();
@@ -3205,7 +3215,7 @@ void UpdatePanel()
    TPDL_ClosedSummary();
    TPDL_FinalStatus();
    TPDA_LimitButtons();TPDA_PerformanceRows();
-   TPC_Render();TPDC_Render();
+   TPC_Render();TPDC_Render();TPDL_NoticeRender();
    TP_BasketColumnLayout();
    TP_PanelVisibility();
    TPR_End();
@@ -3243,6 +3253,7 @@ void OnChartEvent(
   RebuildResponsivePanel();TPM_Render();return;
  }
 
+ if(id==CHARTEVENT_OBJECT_CLICK && TPDL_NoticeEvent(sparam))return;
  if(id==CHARTEVENT_OBJECT_CLICK && tp_spread_confirm_open) {
   if(sparam=="TradePilot_SPREAD_CONFIRM_CANCEL"){TP_SpreadTradeClose();return;}
   if(sparam=="TradePilot_SPREAD_CONFIRM_CONTINUE"){int side=tp_spread_pending_side;bool calculation=tp_spread_pending_calculation;TP_SpreadTradeClose();if(calculation)TP_CalculateRequested(true);else ExecutePanelTrade((ENUM_ORDER_TYPE)side,true);return;}

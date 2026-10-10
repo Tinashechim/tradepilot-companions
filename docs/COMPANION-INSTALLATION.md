@@ -72,3 +72,7 @@ Daily Performance and Daily Loss Limit each have their own Apply wins/losses con
 
 ## Basket display correction (1.0.30)
 Current Basket stays hidden while OFF, including intermediate redraws when the main panel expands. Trading permissions and account settings are unchanged. Close the intended terminal before replacing its compiled companion.
+
+
+### Daily budget renewal (1.0.36)
+The daily loss allowance renews at 23:30 broker time and counts only positions originally entered in that period. Carry-over entries and their later closures remain in older baskets. A blocked Buy/Sell request shows a themed notice with review and renewal guidance and does not send an order. Keep trading off when checking a new installation; the update preserves existing orders and permission settings.

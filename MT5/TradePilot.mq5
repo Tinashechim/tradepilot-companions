@@ -1681,6 +1681,9 @@ void UpdateTradeCalculationDisplay(
 {
    double required_margin=-1;
    int margin_check=calculated_volume>0 ? TP_CheckMargin(_Symbol,(int)order_type,entry,calculated_volume,required_margin) : -1;
+   bool rejected_size=calculated_volume==0 && tp_size_reason=="Insufficient free margin" && tp_size_requested>0;
+   if(rejected_size){required_margin=tp_requested_margin;margin_check=tp_requested_margin_check;}
+   ObjectSetString(0,"TradePilot_MARGIN_LABEL",OBJPROP_TEXT,"Required Margin");
    double minimum =
       SymbolInfoDouble(
          _Symbol,
@@ -1711,9 +1714,11 @@ void UpdateTradeCalculationDisplay(
       0,
       "TradePilot_MARGIN_VALUE",
       OBJPROP_TEXT,
-      margin_check<0 ? "Not verified" : DoubleToString(required_margin, 2)
+      margin_check<0 ? (calculated_volume==0?"Not calculated":"Not verified") : DoubleToString(required_margin, 2)
    );
    ObjectSetInteger(0,"TradePilot_MARGIN_VALUE",OBJPROP_COLOR,margin_check==1 ? C'90,220,140' : C'255,100,100');
+   ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TOOLTIP,tp_size_detail+tp_size_reason);
+   ObjectSetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TOOLTIP,rejected_size?"Required margin for the displayed risk-based size of "+DoubleToString(tp_size_requested,8)+" lots. Available free margin: "+DoubleToString(tp_margin_free,2)+". Red means this size is unaffordable and will not be sent. Moving the planned stop recalculates its size and margin.":calculated_volume==0?"No permitted lot size was produced and no broker margin amount was available. Read the Calculated Size explanation.":"Margin is checked against current free margin for the calculated size. Broker acceptance remains required.");
 
    ObjectSetString(
       0,
@@ -1731,14 +1736,14 @@ void UpdateTradeCalculationDisplay(
          0,
          "TradePilot_SIZE_VALUE",
          OBJPROP_TEXT,
-         calculated_volume<0 ? "Margin not verified" : "Below minimum lot"
+         rejected_size ? DoubleToString(tp_size_requested,2) : tp_size_reason!="" ? tp_size_reason : calculated_volume<0 ? "Margin not verified" : "Below minimum lot"
       );
 
       ObjectSetInteger(
          0,
          "TradePilot_SIZE_VALUE",
          OBJPROP_COLOR,
-         C'255,190,80'
+         C'255,100,100'
       );
    }
    else
@@ -1794,25 +1799,19 @@ void CalculatePositionSize()
       );
 
    if(
+      !MathIsValidNumber(entered_risk) || !MathIsValidNumber(entry) || !MathIsValidNumber(stop) ||
       entered_risk <= 0.0 ||
       entry <= 0.0 ||
       stop <= 0.0 ||
       entry == stop
    )
-      return;
+   {TP_SizeFailure("Check sizing inputs","Enter a positive risk, entry and stop price. Entry and stop must be different. No order was sent.");return;}
 
    risk_value = entered_risk;
 
-   double risk_amount =
-      TPDL_CapRisk(GetRiskAmount());
-   if(risk_amount<=0 && TPDL_Limit()>0){
-      string reason="";if(!TPDL_EntryAllowed(reason)){
-         ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TEXT,"Daily budget blocked");
-         ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TOOLTIP,reason);
-         ObjectSetInteger(0,"TradePilot_SIZE_VALUE",OBJPROP_COLOR,C'255,100,100');
-         ObjectSetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TEXT,"Not calculated");return;
-      }
-   }
+   string budget_reason="";
+   double risk_amount=TPDL_SizingRisk(GetRiskAmount(),budget_reason);
+   if(risk_amount<=0){TP_SizeFailure(StringFind(budget_reason,"Daily loss limit reached")==0?"Daily limit reached":"Daily check pending",budget_reason!=""?budget_reason:"The entered risk needs a verified positive account balance. No order was sent.");return;}
 
 
    ENUM_ORDER_TYPE order_type =
@@ -1827,8 +1826,8 @@ void CalculatePositionSize()
          stop
       );
 
-   if(planned_loss_per_lot <= 0.0)
-      return;
+   if(!MathIsValidNumber(planned_loss_per_lot) || planned_loss_per_lot <= 0.0)
+   {TP_SizeFailure("Risk calculation pending","The broker did not provide a usable stop-loss risk calculation for this symbol. Check the connection and symbol prices, then calculate again. No order was sent.");return;}
 
    double calculated_volume =
       NormalizeCalculatedVolume(
@@ -1836,6 +1835,7 @@ void CalculatePositionSize()
          planned_loss_per_lot
       );
 
+   TP_SizeDiagnostic(risk_amount / planned_loss_per_lot,risk_amount,planned_loss_per_lot,AccountInfoString(ACCOUNT_CURRENCY));
    calculated_volume=TP_AffordableLots(_Symbol,(int)order_type,entry,calculated_volume);
    ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TOOLTIP,"Size is capped by broker lot rules, stop-loss risk and current free margin. Actual risk can be below the requested risk when margin limits the size.");
    UpdateTradeCalculationDisplay(
@@ -1845,6 +1845,8 @@ void CalculatePositionSize()
       risk_amount,
       calculated_volume
    );
+   Print("TradePilot sizing: ",_Symbol," | ",tp_size_detail," | ",tp_size_reason);
+   TP_SizeRowLayout();
 }
 
 
@@ -2733,7 +2735,7 @@ void CreatePanel()
 
    CreateLabel("TradePilot_MARGIN_LABEL", "Required Margin",
                LabelX(), py + S(686), FontSize(BASE_FONT_NORMAL), C'190,195,205');
-   CreateValue("TradePilot_MARGIN_VALUE", "Not verified", py + S(686), clrWhite);
+   CreateValue("TradePilot_MARGIN_VALUE", "Not calculated", py + S(686), C'255,100,100');
    CreateLabel("TradePilot_MARGIN_UNIT", account_currency,
                UnitX(), py + S(687), FontSize(BASE_FONT_SMALL), C'160,165,175');
 
@@ -2857,8 +2859,9 @@ void RebuildResponsivePanel()
    TPDL_ClosedSummary();
    TPDL_FinalStatus();
    TPDA_LimitButtons();TPDA_PerformanceRows();
-   TPC_Render();TPDC_Render();TPDL_NoticeRender();
+   TPC_Render();TPDC_Render();TPDL_NoticeRender();if(tp_spread_confirm_open)TP_SpreadTradePrompt();
    TP_BasketColumnLayout();
+   TP_SizeRowLayout();
    TP_PanelVisibility();
    ChartRedraw();
 }
@@ -3215,8 +3218,9 @@ void UpdatePanel()
    TPDL_ClosedSummary();
    TPDL_FinalStatus();
    TPDA_LimitButtons();TPDA_PerformanceRows();
-   TPC_Render();TPDC_Render();TPDL_NoticeRender();
+   TPC_Render();TPDC_Render();TPDL_NoticeRender();if(tp_spread_confirm_open)TP_SpreadTradePrompt();
    TP_BasketColumnLayout();
+   TP_SizeRowLayout();
    TP_PanelVisibility();
    TPR_End();
    ChartRedraw();
@@ -4080,15 +4084,20 @@ void TP_SpreadTradeClose()
 }
 void TP_SpreadTradePrompt()
 {
- int x=LabelX(),y=PanelY()+S(690);
+ int x=PanelX()+PanelWidth()+S(24),y=PanelY()+S(55);
+ int chart_width=(int)ChartGetInteger(0,CHART_WIDTH_IN_PIXELS),chart_height=(int)ChartGetInteger(0,CHART_HEIGHT_IN_PIXELS);
+ x=MathMax(S(8),MathMin(x,chart_width-S(294)));y=MathMax(S(8),MathMin(y,chart_height-S(82)));
  string text=tp_spread_pending_calculation?"Spread OFF. Continue calculating?":"Spread OFF. Continue with this trade?";
  CreateRectangle("TradePilot_SPREAD_CONFIRM_BG",x-S(4),y-S(5),S(286),S(70),C'25,28,35',C'110,125,145');
  CreateLabel("TradePilot_SPREAD_CONFIRM_TEXT",text,x,y,TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),S(278),S(16)),clrWhite);
  ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_TEXT",OBJPROP_TOOLTIP,tp_spread_pending_calculation?"Calculate using your entered stop without extra spread allowance. Continue calculates only; it sends no order. Cancel leaves the calculation unchanged.":"Continue this one trade using the entered stop without extra spread allowance. Quote, stop, risk, margin and trading permissions are checked again. Cancel sends nothing.");
  CreateButton("TradePilot_SPREAD_CONFIRM_CONTINUE","Continue",x,y+S(25),S(130),S(24),C'55,60,70');
- CreateButton("TradePilot_SPREAD_CONFIRM_CANCEL","Cancel",ValueX(),y+S(25),S(130),S(24),C'140,45,45');
+ CreateButton("TradePilot_SPREAD_CONFIRM_CANCEL","Cancel",x+S(148),y+S(25),S(130),S(24),C'140,45,45');
  ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_CONTINUE",OBJPROP_TOOLTIP,tp_spread_pending_calculation?"Calculate with spread allowance OFF. This does not place a trade.":"Continue this one order with spread allowance OFF after normal broker checks.");
- ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_CANCEL",OBJPROP_TOOLTIP,"Cancel this request without sending an order or changing the spread setting.");ChartRedraw();
+ ObjectSetString(0,"TradePilot_SPREAD_CONFIRM_CANCEL",OBJPROP_TOOLTIP,"Cancel this request without sending an order or changing the spread setting.");
+ ObjectSetInteger(0,"TradePilot_SPREAD_CONFIRM_CONTINUE",OBJPROP_ZORDER,100);
+ ObjectSetInteger(0,"TradePilot_SPREAD_CONFIRM_CANCEL",OBJPROP_ZORDER,100);
+ ChartRedraw();
 }
 
 void TP_CalculateRequested(bool confirmed=false)
@@ -4098,3 +4107,35 @@ void TP_CalculateRequested(bool confirmed=false)
 }
 
 #include "TradePilotPanelVisibility.mqh"
+
+// Status text uses the full value column; lots is meaningful only for a number.
+void TP_SizeRowLayout()
+{
+#ifdef __MQL5__
+ string value="TradePilot_SIZE_VALUE",unit="TradePilot_SIZE_UNIT";
+#else
+ string value="TradePilot_CALCULATED_VALUE",unit="TradePilot_CALCULATED_UNIT";
+#endif
+ if(ObjectFind(0,value)<0)return;
+ string text=ObjectGetString(0,value,OBJPROP_TEXT);
+ bool numeric=StringToDouble(text)>0;
+ ObjectSetString(0,unit,OBJPROP_TEXT,"lots");
+ ObjectSetInteger(0,unit,OBJPROP_TIMEFRAMES,numeric && tp_main_open?OBJ_ALL_PERIODS:OBJ_NO_PERIODS);
+ int width=numeric?UnitX()-ValueX()-S(8):PanelX()+PanelWidth()-S(12)-ValueX();
+ ObjectSetInteger(0,value,OBJPROP_FONTSIZE,TP_HeaderFont(text,FontSize(BASE_FONT_NORMAL),width,S(16)));
+ string margin=ObjectGetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TEXT);
+ if(text=="Not calculated" && margin=="Not verified") {
+  ObjectSetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TEXT,"Not calculated");
+  margin="Not calculated";
+ }
+ if(margin=="Not calculated" || margin=="Not verified")ObjectSetInteger(0,"TradePilot_MARGIN_VALUE",OBJPROP_COLOR,C'255,100,100');
+}
+
+void TP_SizeFailure(string title,string reason)
+{
+ ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TEXT,title);
+ ObjectSetString(0,"TradePilot_SIZE_VALUE",OBJPROP_TOOLTIP,reason);
+ ObjectSetInteger(0,"TradePilot_SIZE_VALUE",OBJPROP_COLOR,C'255,100,100');
+ ObjectSetString(0,"TradePilot_MARGIN_VALUE",OBJPROP_TEXT,"Not calculated");
+ TP_SizeRowLayout();ChartRedraw();
+}

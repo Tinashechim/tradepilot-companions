@@ -303,3 +303,15 @@ bool TPDL_NoticeEvent(string name)
  return true;
 }
 #endif
+
+// One verified budget snapshot per sizing request. Pending history is not a reached limit.
+double TPDL_SizingRisk(double requested,string &reason)
+{
+ reason="";
+ if(TPDL_Limit()<=0)return requested;
+ if(!MathIsValidNumber(TPDL_Cash())||TPDL_Cash()<=0){reason="The daily starting balance is not available. Wait for a verified broker balance, then calculate again.";return 0;}
+ double net=0,remaining=0;bool blocked=false;
+ if(!TPDL_State(net,remaining,blocked)){reason="The daily budget needs verified broker history. Keep the terminal connected while history finishes loading, then calculate again.";return 0;}
+ if(blocked||remaining<=0){reason="Daily loss limit reached. Review Current Basket and the saved limit, or wait for renewal at 23:30 broker time. Existing positions remain open.";return 0;}
+ return MathMin(requested,remaining);
+}

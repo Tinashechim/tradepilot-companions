@@ -18,6 +18,11 @@ void TP_PanelVisibility()
  for(int i=ObjectsTotal(0,-1,-1)-1;i>=0;i--) {
   string key=ObjectName(0,i,-1,-1);
   if(StringFind(key,"TradePilot_")!=0 || StringFind(key,"CONFIRM")>=0)continue;
+  if(key=="TradePilot_CALCULATED_UNIT") {
+   long desired=tp_main_open && StringToDouble(ObjectGetString(0,"TradePilot_CALCULATED_VALUE",OBJPROP_TEXT))>0?OBJ_ALL_PERIODS:OBJ_NO_PERIODS;
+   if(ObjectGetInteger(0,key,OBJPROP_TIMEFRAMES)!=desired)ObjectSetInteger(0,key,OBJPROP_TIMEFRAMES,desired);
+   continue;
+  }
   long type=ObjectGetInteger(0,key,OBJPROP_TYPE);
   if(type==OBJ_HLINE||type==OBJ_VLINE||type==OBJ_TREND)continue;
   if(key=="TPUI_MAIN_TOGGLE"||key=="TPUI_BASKET_TOGGLE"||key=="TPUI_MAIN_COLLAPSED"||key=="TPUI_MAIN_CAPTION"||key=="TPUI_BASKET_COLLAPSED"||key=="TPUI_BASKET_CAPTION")continue;
@@ -93,6 +98,11 @@ bool TP_PanelToggle(string name)
  for(int i=ObjectsTotal(0,-1,-1)-1;i>=0;i--) {
   string key=ObjectName(0,i,-1,-1);
   if(StringFind(key,"TradePilot_")!=0 || StringFind(key,"CONFIRM")>=0)continue;
+  if(key=="TradePilot_CALCULATED_UNIT") {
+   long desired=tp_main_open && StringToDouble(ObjectGetString(0,"TradePilot_CALCULATED_VALUE",OBJPROP_TEXT))>0?OBJ_ALL_PERIODS:OBJ_NO_PERIODS;
+   if(ObjectGetInteger(0,key,OBJPROP_TIMEFRAMES)!=desired)ObjectSetInteger(0,key,OBJPROP_TIMEFRAMES,desired);
+   continue;
+  }
   long type=ObjectGetInteger(0,key,OBJPROP_TYPE);
   if(type==OBJ_HLINE||type==OBJ_VLINE||type==OBJ_TREND)continue;
   if(TP_IsBasketObject(key)!=basket_toggle)continue;

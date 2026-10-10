@@ -50,7 +50,7 @@ void TPDA_PerformanceRows()
  double closed=0,floating=0,adjusted=0;bool ready=TPDL_Totals(closed,floating,adjusted);
  double base=GetSessionBaseTargetMoney(period),wins=0,losses=0;
  double entered=TPDR_Parse(ObjectGetString(0,"TradePilot_DAILY_TARGET_EDIT",OBJPROP_TEXT));
- if(MathIsValidNumber(entered) && entered>0)base=TPDR_Enabled()?entered*TPDR_RiskCash():(ObjectGetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TEXT)=="Percentage"?GetSessionStartBalance(period)*entered/100:entered);
+ if(MathIsValidNumber(entered) && entered>0)base=TPDR_Enabled()?entered*TPDR_RiskCash():(daily_percentage_mode?GetSessionStartBalance(period)*entered/100:entered);
  double preview=TPDA_Target(period,base,true);
  ready=ready && TPDA_Closed(period,wins,losses);
  // The completed outcomes are in the adjusted target; do not subtract them twice.
@@ -61,7 +61,7 @@ void TPDA_PerformanceRows()
  CreateLabel("TradePilot_PERF_REMAIN_LABEL","Remaining target",LabelX(),PanelY()+S(162),FontSize(BASE_FONT_NORMAL),C'190,195,205');
  CreateLabel("TradePilot_PERF_REMAIN",ready?TP_BasketModeValue(period,remaining,currency):"Verification pending",ValueX(),PanelY()+S(162),FontSize(BASE_FONT_NORMAL),C'90,220,140');
  ObjectSetString(0,"TradePilot_PERF_REMAIN",OBJPROP_TOOLTIP,"Amount still needed for this day's target. Apply wins reduces the target; Apply losses increases it. Completed results are counted once. The displayed preview is saved only after Update and Yes.");
- TPDR_TargetEquivalents(period,preview,ObjectGetString(0,"TradePilot_DAILY_MODE_BUTTON",OBJPROP_TEXT)=="Percentage",currency);
+ TPDR_TargetEquivalents(period,preview,daily_percentage_mode,currency);
  ObjectSetString(0,"TradePilot_DAILY_EQUIVALENT_LABEL",OBJPROP_TEXT,"Target preview");
  ObjectSetString(0,"TradePilot_DAILY_EQUIVALENT",OBJPROP_TOOLTIP,"Preview of the base daily target adjusted by the selected completed Current Basket wins and losses. Update and Yes saves your selections. No changes are applied while this is only a preview.");
 }

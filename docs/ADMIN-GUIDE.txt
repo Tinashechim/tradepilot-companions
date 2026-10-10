@@ -1,72 +1,94 @@
-
-EXECUTED TRADES
-Double-click an account row to open Executed trades; use Edit account to change registration details. Executed trades is also available inside Analytics. Choose From/To broker dates, then search by account name/number, broker, symbol or ticket and select All, Manual execution, System execution or Classification pending. Press Search executions to apply the filters. Double-click a result for its recorded details.
-View, Download and Email produce the same filtered PDF with its reporting range. The screen shows at most 2,000 records to remain manageable; narrow the filters or export the complete matching report. Both scrollbars are available. Retained history is readable when the terminal is offline, but it is not a current broker query. Partial exits are separate records, and separate entry charges stay on entry records. Missing history is not invented.
-
-DAILY LOSS LIMITS
-Daily Limits is an account-wide TradePilot entry check. Choose Cash or Percentage, enter a positive loss limit and press Update. Percentage uses the account's starting balance for its broker daily period. Blank means no daily entry limit. Removing a saved limit requires a warning confirmation; changing a limit creates a dated Account changes record in Analytics.
-Budget left includes net trading results since the broker-day boundary at 23:30 and all current open floating results, including carried positions. Available broker commission, swap and fee records are included. Deposits and withdrawals are not trading profit. Daily Performance and Daily Loss Limit have independent Apply wins/losses selections for completed Current Basket results. Open risk and other-day results remain part of the loss guard.
-After the loss threshold is reached, new TradePilot entries stay paused for that broker period even if prices recover. Update the limit deliberately or wait for the next period. Hover over Buy or Sell for the reason. Missing or unverified daily-budget replies block new entries without labelling an otherwise verified broker connection offline.
-This check does not close existing positions, cancel broker pending orders or control orders entered outside TradePilot. Pending orders already accepted by the broker can still execute. Stop-loss estimates cannot guarantee the final loss during price gaps, slippage or additional broker charges. Each lead and follower uses its own broker results and remaining budget.
-Daily-limit and daily-target messages need enabled email delivery and the relevant account notification preference. Account changes retains dated limit edits with individual references. The desktop and both companions must be the matching version; older companions require a setup refresh.
-
-SPREAD AND ACCURATE TRADE REPORTS
-The position sizer Spread ON/OFF control starts OFF. ON moves the planned stop one current spread farther from entry and recalculates size; OFF restores the unadjusted level. Dragging/typing a new stop establishes a new base and applies the spread once. Refreshing never repeatedly adds spread. Existing trade stops are not modified by this planning control. Hover over the control for its purpose.
-Activity trade rows include unique TradePilot references; historical CMD references remain readable. Click an attempt to view its exact recorded account, date, symbol, status and response, then View, Download or Email its PDF. A symbol error applies only to that attempt; no fresh quote and broker/local trading restrictions are reported separately. Selection failures without an broker symbol-not-found code are not labelled symbol unavailable.
-
-COUNTRY, PHONE AND CHANGING THE LEAD
-Country and phone are mandatory when adding or editing accounts. Select an account owner country from the full country list, then choose the phone country/dialling code and enter the national number. The phone country can differ from the owner country.
-To change a follower to lead, Edit account and select Lead account in Account type. Review existing positions first, keep trading off, and close the current lead and the selected follower terminals. Confirm the change. The former lead becomes a follower; both affected setups need refresh through Review terminal setup. Existing trades are not closed or transferred. Pending app commands are cancelled, prior trades are not replayed, payments/history remain recorded, and both role changes appear in account/report audits.
-
-BROKER AUTOMATED TRADING RESTRICTIONS
-MT5 error 10026 means the broker server refused automated trading; the toolbar/F7 switches cannot override it. Ask the broker whether this account permits Expert Advisors. Error 10027 is the terminal switch restriction. Review terminal setup reads fresh terminal, advisor and account permission checks separately. A successful connection or enabled local switch does not guarantee the broker will execute an order. Failed entries are not replayed.
-
-ADMIN COMPANY INFORMATION
-Company information appears only in Add account for the lead account, before the personal names. Company or account holder name is required. Admin name, company registration, VAT, tax number, address and logo are optional. Edit account contains account details only. Upload a PNG or JPEG company logo. Blank business fields are omitted. Company logos appear at the top centre and TradePilot at the bottom centre of documents.
-
-MANUAL FOLLOWER CHARTS
-Open the follower charts you want manually. TradePilot does not open follower charts to match the lead. It attaches its tools to eligible existing/opened charts while the desktop and terminal are running. Other advisors are preserved; Activity explains conflicts. Matching TradePilot companions that stop reporting can be restarted with their saved inputs and permission flags unchanged.
-
-SEARCH, LEAD HISTORY AND CONNECTION RELIABILITY
-Type in any dropdown to narrow the matching choices, then open the arrow list and select a result. Fixed choice fields retain valid selections; typing does not create a new platform or country. Accounts search finds words in names, account numbers, broker, platform, country, email and Paid/Frozen/Due status. Admin guide Search guide words highlights matching text. Activity and Email outbox each have their own word search.
-The current lead is always the first account row. Lead count is the number of recorded lead appointments, including the initial lead and later promotions. Retained role audits rebuild previous evidenced appointments; unrecorded history is not invented.
-If a follower is offline for more than one minute, TradePilot queues one connection-check email per outage to its saved email and the Admin email. Delivery requires the desktop running, enabled email and a working provider. Reconnection closes the outage. Analytics includes the count of outages over one minute, offline/online times, reference and reason, plus whether live positions were observed around/during the outage. These are desktop-observed times, not proof of executions while disconnected; app-closed gaps and missing history cannot be reconstructed. Connection audit PDFs retain details for each account.
-
-
-
-CHART TOOLS LAYOUT
-Point Measurer sits directly beside the main left-hand grid. Pending Order sits underneath Point Measurer in that same second column. The panels resize together to fit the chart; hiding Point Measurer moves Pending Order up without overlapping the grid. Pending Order still starts OFF and must be enabled manually.
-
-ANALYTICS PERIOD AND CLOSING THE APP
-Analytics first asks for Current period (broker month to current broker date) or Date range. Enter YYYY-MM-DD dates and press Next. The screen and every exported summary PDF display the inclusive range. Exit records are filtered by broker exit date; balance, equity, open orders and account counts remain current snapshots, not historical assets. Broker retention may leave incomplete history. Back returns to the period selector.
-All visible account roles use Lead account and Follower account. Generated PDFs retain TradePilot branding without the personal author line.
-Closing TradePilot always asks for confirmation and explains copying, emails and local terminal schedules. On an ordinary Windows shutdown/restart/sign-out, Windows can show TradePilot's warning with the choice to cancel or force shutdown. Forced shutdown, a killed process, battery failure or power loss may bypass this warning. The app cannot guarantee a warning or continued trade management when Windows or power stops. Existing broker positions and orders are not automatically closed.
-
-SEND MAIL SIGNATURE
-Use Send Mail after Review terminal setup. Select one or several followers, edit recipient addresses, subject and message, or use Broadcast to all accounts. Edit the separate Signature field and click Save signature to reuse it later. Sending also saves the signature. Cancel closes the message without sending. Each recipient receives a separate message. Email setup and reminders contains sender credentials and reminder settings.
 TRADEPILOT — ADMIN GUIDE
 
-Account totals and connection audits
-The Accounts header shows Active, Frozen and Due as fractions of registered accounts, followed by Total accounts. Analytics shows one combined summary of all follower accounts, without individual account sheets or an Account report action. Connection audit filters detected offline periods by local desktop date, with a unique ERR ID, first detected time, reconnection time and reported reason. Use Pending diagnosis while the cause is not established; never substitute an invented explanation. Audits are read-only and can be viewed, downloaded or emailed as PDFs. New reports and payment logs include recorded target resets and connection audits. Times represent desktop observations; app-closed gaps cannot be reconstructed.
+CONTENTS
+1. Account Setup
+2. Connect the lead account
+3. Add and connect each follower
+4. Update TradePilot
+5. Use consistent risk settings
+6. Record the follower's monthly payment
+7. Start a demo test
+8. Understand monthly target progress
+9. Use the chart tools
+10. Manage clients each day
+11. Freeze or unfreeze an account
+12. Request PDF statements
+13. End-of-period email
+14. Set up optional email reminders
+15. Selected Lead and Follower account Analytics
+16. View, download or email documents
+17. Payment reminder schedule and Due Accounts
+18. Account performance reports
+19. Pending orders and scheduled placement
+ACCOUNT GROUPS, DAILY UPDATES AND BROKER SIZING
+NAMED STRATEGIES AND SIMULTANEOUS LEADS
+LOCAL ACCESS, COMPANY INFORMATION AND AUDIT REFERENCES
+EMAIL PREFERENCES AND DESKTOP POWER
+DAILY TARGETS AND SEPARATE BASKETS
+SELECTED ANALYTICS AND EXECUTIONS
+TERMINAL KEY REFRESH AND NET TARGETS
+ANALYTICS CHARTS
+TERMINAL COLUMN LAYOUT AND PENDING FILLS
+BASKET COSTS AND SPREAD
+CARRY-OVER PROGRESS
+BASKET ROWS AND DISPLAY MODES
+DAILY UPDATE CONFIRMATION
+TERMINAL HEADER AND STARTUP
+COMPILED COMPANION DOWNLOAD
+MARGIN INDICATORS AND SAVED PROFILES
+LEAD TRADE ACTIVATION NOTICES
+LABEL DESCRIPTIONS
+SYSTEM MANUAL EXECUTION
+PUBLIC COMPANION SOURCE
+TARGET AND BUDGET EQUIVALENTS
+PANEL CONTROLS AND LAYOUT
+CURRENT BASKET OUTCOMES
+BASKET DISPLAY MODES
+WIN AND LOSS AMOUNTS
+DAILY LOSS LIMIT AND CHART DISPLAY
+CALCULATE WITH SPREAD OFF
+REPORT TOTALS AND CARRY-OVER BALANCES
+DAILY LOSS BUDGET DISPLAY
+EXACT PANEL ZOOM
+NUMBER ENTRY ALIGNMENT
+BUDGET LEFT ON ONE LINE
+COMPACT PANEL AND ZOOM SAFETY
+DESKTOP ACCESS AND CURRENT LEADS
+DAILY UPDATE CONFIRMATIONS
+CHECK CURRENT BASKET BEFORE UPDATING DAILY LOSS LIMIT
+INDEPENDENT DAILY RESULT CONTROLS
+DAILY LOSS BUDGET AND INVESTOR REPORTS
+PANEL DISPLAY UPDATE (1.0.32)
+SETTINGS — AUTOMATIC EMAIL NOTIFICATIONS
+SETTINGS TABS
+SIZING EXPLANATIONS AND ADMIN EMAIL CHOICES
+EXECUTED TRADES
+DAILY LOSS LIMITS
+SPREAD AND ACCURATE TRADE REPORTS
+COUNTRY, PHONE AND CHANGING THE LEAD
+BROKER AUTOMATED TRADING RESTRICTIONS
+ADMIN COMPANY INFORMATION
+MANUAL FOLLOWER CHARTS
+SEARCH, LEAD HISTORY AND CONNECTION RELIABILITY
+CHART TOOLS LAYOUT
+ANALYTICS PERIOD AND CLOSING THE APP
+SEND MAIL SIGNATURE
 
-Start here
-Use one demo lead account and one demo follower for your first test. Each account needs its own MetaTrader installation. MT4 and MT5 hedging accounts are supported; MT5 netting accounts are not. Keep copying paused while you set up accounts. Only verified MT4 and MT5 connectors are available; future connectors need their own guided activation process.
+1. Account Setup
+In Accounts, click Add account. Set Account type to Lead account and choose MT4 or MT5. Enter the account number and broker server exactly as shown in MetaTrader. Enter the requested contact details and use Next. Keep trading permissions disabled in MetaTrader until setup is complete. Enter broker passwords only in MetaTrader. Add account is one seven-step process. Steps 1–3 collect account owner/contact, broker identity and subscription details; step 4 selects the dedicated terminal; step 5 waits for closure and prepares automatically; step 6 opens the terminal and waits for its verified reply; step 7 is a separate trading-permission page. Use Next after entering the required information and Back to review without clearing it or repeating completed preparation. Finish setup may leave trading off. Existing accounts use the Terminal Setup button immediately after Add account for recovery; it is separate from editing account information. Lead account email and phone, including country code, are required when adding/editing the lead account. Every generated PDF uses the Admin email from Email setup and reminders and the lead account phone number.
 
-1. Update TradePilot
-Install the latest approved update through Microsoft Store. Open TradePilot from Start. After an update that changes companion files or startup preparation, use Review terminal setup for the affected account. Releases that change only desktop reports do not need companion reinstall. TradePilot installs the compiled companion; you do not need to find an EA file or press F7 to compile it.
-
-2. Add the lead account account
-In Accounts, click Add account. Set Account type to Lead account and choose MT4 or MT5. Enter the account number and broker server exactly as shown in MetaTrader. Enter the requested contact details and use Next. Keep trading permissions disabled in MetaTrader until setup is complete. Enter broker passwords only in MetaTrader. Add account is one seven-step process. Steps 1–3 collect account owner/contact, broker identity and subscription details; step 4 selects the dedicated terminal; step 5 waits for closure and prepares automatically; step 6 opens the terminal and waits for its verified reply; step 7 is a separate trading-permission page. Use Next after entering the required information and Back to review without clearing it or repeating completed preparation. Finish setup may leave trading off. Existing accounts use the Review terminal setup button immediately after Edit account for recovery; it is separate from editing account information. Lead account email and phone, including country code, are required when adding/editing the lead account. Every generated PDF uses the Admin email from Email setup and reminders and the lead account phone number.
-
-3. Connect the lead account
-Select the lead account row and click Review terminal setup. Choose the terminal dedicated to that account; check the displayed location if several terminals are installed. Open a chart in MetaTrader and save its profile if no chart can be detected. Only if a chart symbol field appears, enter the exact broker symbol, including its suffix (example: EURUSD.a).
+2. Connect the lead account
+Select the lead account row and click Terminal Setup. Choose the terminal dedicated to that account; check the displayed location if several terminals are installed. Open a chart in MetaTrader and save its profile if no chart can be detected. Only if a chart symbol field appears, enter the exact broker symbol, including its suffix (example: EURUSD.a).
 
 Close only the selected MetaTrader terminal first. TradePilot detects that the selected terminal is closed and automatically installs its companion on every eligible saved chart, preserving chart symbols, timeframes, drawings and other advisors, requests broker-available trade history and saves the connection settings. Wait for the preparation checkmark, then click Open terminal. Log in to the registered broker account if asked. Return to TradePilot and wait for a returned, identity-matched connection check. Sent checks, replies and failures appear in Activity. Click a failed Activity check for its dated error report. OFFLINE in the account table stays a simple status. Follow the activation checklist when you are ready to test. In MT4, enable AutoTrading, select each TradePilot chart, press F7, open Common, check Allow live trading and click OK. In MT5, enable Algo Trading, then use F7 → Common → Allow Algo Trading → OK on each TradePilot chart. Repeat for every TradePilot chart, including new charts. F7 opens advisor properties; no compilation is needed. Leave DLL permissions unchanged. All readiness marks are read-only and update automatically from fresh registered replies, actual advisor permission and follower history/payment. There are no manual permission checkboxes. The single shared connection prefers an available TradePilot chart whose advisor permission you have actually enabled; it does not enable permission for you. Use the setup window scrollbar or Page Down to see the full guide. Future platforms need their own verified activation instructions before their connectors become available.
 
-4. Add and connect each follower
+3. Add and connect each follower
 Click Add account and set Account type to Follower account (the follower). Enter the client's name, email, platform, account number and broker server. Choose a whole monthly target from 1% to 100%. Enter the monthly payment amount and currency; use 0 for a free demo test. A payment reference helps match your records. If brokers use different symbol names, fill Different broker symbol names with the exact lead account=follower pair (example: EURUSD=EURUSD.a). Otherwise leave it blank. Use Next with terminal trading permissions disabled and continue the same guided setup using its separate terminal.
 
 TradePilot handles history setup in the background. No I loaded and checked All History checkbox is required. MT5 requests history directly from the broker. MT4 is configured for All History before startup and waits for connected, stable broker-available records. Broker retention can limit older history; the app cannot recreate records a broker no longer supplies. History loading is reported automatically. MT5 followers must use hedging accounts.
+
+4. Update TradePilot
+Install the latest approved update through Microsoft Store. Open TradePilot from Start. After an update that changes companion files or startup preparation, use Terminal Setup for the affected account. Releases that change only desktop reports do not need companion reinstall. TradePilot installs the compiled companion; you do not need to find an EA file or press F7 to compile it.
 
 5. Use consistent risk settings
 The position sizer and copier calculate risk from the current account balance and the distance from entry to stop loss. The lead account records the risk percentage selected in its TradePilot panel; each follower uses that percentage with its own balance and broker contract size. Symbol mappings connect different broker names. The measurer shows chart distances; the basket reports actual trading results.
@@ -116,7 +138,7 @@ Open Send Mail → Email setup and reminders and enter your admin and sender ema
 
 If a status needs attention
 • Waiting for terminal: open the configured connection and check the registered login and server.
-• Update terminal companion: pause new copying and repeat Review terminal setup after the Store update.
+• Update terminal companion: pause new copying and repeat Terminal Setup after the Store update.
 • History loading: keep the registered terminal connected. TradePilot handles the history request and readiness in the background; no manual history confirmation is needed.
 • Different broker names: set the exact lead account=follower symbol mapping.
 • Inactive (red): check the broker month, payment, history, connection and trading permission. For Frozen, review the recorded reason and unfreeze only when appropriate.
@@ -154,7 +176,7 @@ Analytics keeps its current scroll position and updates existing values without 
 PDF reports do not include the author byline. Lead Account Information appears before Report overview. Editable text fields support normal Ctrl+C/Ctrl+V shortcuts and right-click Cut, Copy, Paste and Select all; read-only fields allow copying but cannot be pasted into or changed.
 
 Send Mail
-The Accounts actions are Add account, Paid, Edit account, Review terminal setup, Send Mail, Freeze account and Analytics. Settings is removed from the main app. Open Send Mail and check the named account recipients. Search by name, account number or email. Hidden checked accounts remain selected. Select all followers checks every listed follower with an email. Select Due accounts checks only followers whose fresh connected broker month is currently unpaid and who have a saved email; offline and unverified months are excluded. Broadcast to all accounts checks all listed registered emails, including leads. Clear selection unchecks everyone. Changing the checked selection replaces the editable address list; re-add any custom external addresses after selecting accounts. Edit the addresses, subject and message before Send Mail. Recipients get individual messages without seeing other addresses. The final confirmation lists the recipients. Cancel or Escape queues nothing. Delivery results appear in Email outbox. Email setup and reminders contains sender credentials and reminder/payment instructions.
+The Accounts actions are Add account, Terminal Setup, Edit account, Paid, Send Mail, Freeze account and Analytics. Settings and Lock TradePilot are available below the main panel. Open Send Mail and check the named account recipients. Search by name, account number or email. Hidden checked accounts remain selected. Select all followers checks every listed follower with an email. Select Due accounts checks only followers whose fresh connected broker month is currently unpaid and who have a saved email; offline and unverified months are excluded. Broadcast to all accounts checks all listed registered emails, including leads. Clear selection unchecks everyone. Changing the checked selection replaces the editable address list; re-add any custom external addresses after selecting accounts. Edit the addresses, subject and message before Send Mail. Recipients get individual messages without seeing other addresses. The final confirmation lists the recipients. Cancel or Escape queues nothing. Delivery results appear in Email outbox. Email setup and reminders contains sender credentials and reminder/payment instructions.
 
 Saved email app password
 Paste an app password directly into Email setup and reminders, then Save settings. TradePilot stores it with Windows encryption for your current Windows account and reuses it on future launches. The saved-password message confirms it is present without displaying it. Leave the password field blank to keep the saved credential for the same sender/login. Enter a new password to replace it. Remove saved app password marks it for removal and turns email sending off when you Save settings. Closing settings without saving keeps the current credential. A different sender/login needs its own password. Never share the password in chat or put it on PDFs.
@@ -201,7 +223,7 @@ Choose the date range, then the Lead or Follower tab and one, several or all acc
 Completed-position statistics include retained entry and exit costs. MT5 positions with missing entry records, remaining volume or reversals are excluded from complete-position outcomes. The cumulative results chart starts at zero for the selected range and is cash trading results, not an equity curve or investor return. Maximum daily closed-result drawdown uses day-end results; it is not intraday account drawdown.
 
 TERMINAL KEY REFRESH AND NET TARGETS
-Review terminal setup refreshes the selected MT5 account's existing TradePilot chart inputs while its terminal is closed. It preserves chart layouts, other advisors and saved trading permission flags. The shared authenticated owner publishes the account-wide daily reply; other charts keep their interactive tools.
+Terminal Setup refreshes the selected MT5 account's existing TradePilot chart inputs while its terminal is closed. It preserves chart layouts, other advisors and saved trading permission flags. The shared authenticated owner publishes the account-wide daily reply; other charts keep their interactive tools.
 A daily target is a net trading-result target. Reported commission/fees and swap are included once. Bid/ask execution spread already affects broker price profit; adding it again to reported net profit would double-count it. A 500 net target therefore requires sufficient price profit to cover reported costs as well as retain 500. Missing historic spread data is not reconstructed from today's quotes.
 Lead appointment From–To dates follow retained account role records. Current appointments say Current appointment; a missing end date is disclosed as End date not retained. These are recorded account times, not reconstructed broker executions.
 
@@ -238,7 +260,7 @@ Each terminal panel shows TradePilot, By Tinashe Chimanikire and Trade managemen
 
 
 COMPILED COMPANION DOWNLOAD
-In Analytics, Terminal setup files lets you download one ZIP containing MT4/TradePilot.ex4, MT5/TradePilot.ex5 and Setup-guide.pdf. The bundle excludes source code, account credentials, connection settings and databases. Existing downloads are preserved: choose a new filename to save another copy. Follow Add account or Review terminal setup to connect in order; downloading tools does not authenticate an account or grant trading permission. The PDF explains separate charts and the MT4/MT5 permission checks.
+In Analytics, Terminal setup files lets you download one ZIP containing MT4/TradePilot.ex4, MT5/TradePilot.ex5 and Setup-guide.pdf. The bundle excludes source code, account credentials, connection settings and databases. Existing downloads are preserved: choose a new filename to save another copy. Follow Add account or Terminal Setup to connect in order; downloading tools does not authenticate an account or grant trading permission. The PDF explains separate charts and the MT4/MT5 permission checks.
 
 
 MARGIN INDICATORS AND SAVED PROFILES
@@ -342,7 +364,7 @@ PANEL DISPLAY UPDATE (1.0.32)
 The main panel and Current Basket have independent switches. Switching a panel changes its display only; it does not change trading permissions. Total P/L uses a thicker border than Floating P/L. Keep trading off while checking display changes.
 
 SETTINGS — AUTOMATIC EMAIL NOTIFICATIONS
-Open Settings → Email Notifications, select Stop automatic emails for all accounts and Save. This cancels pending automatic connection, trade, target, payment, statement and battery emails. Send Mail and documents you deliberately email remain available. Activity history and trading safeguards remain active. Clear that option and Save to receive future notices again; cancelled emails are not replayed. Editing windows can be minimized, restored or closed using X without blocking Accounts.
+Open Settings → Email Notifications, select Don’t receive email notifications and Save. This cancels pending automatic connection, trade, target, payment, statement and battery emails. Send Mail and documents you deliberately email remain available. Activity history and trading safeguards remain active. Clear that option and Save to receive future notices again; cancelled emails are not replayed. Editing windows can be minimized, restored or closed using X without blocking Accounts.
 
 
 SETTINGS TABS
@@ -361,7 +383,7 @@ The two UPDATE buttons, Target/Limit/Risk Mode button values, and Point Measurer
 
 SIZING EXPLANATIONS AND ADMIN EMAIL CHOICES
 Daily Performance preview uses the selected Percentage or Cash mode, including uppercase button labels. Hover Calculated Size to see allowed cash risk, stop-loss risk per lot, risk-based lot size and the broker minimum. Below minimum lot means stop-loss risk permits less than that minimum; Insufficient free margin means the broker minimum cannot pass the margin check. Margin not verified means that broker check did not return a usable result. If the broker returns a margin amount for the requested volume, Required Margin displays it; unavailable checks are labelled clearly in red. These estimates do not guarantee broker execution.
-Settings → Email Notifications has separate Admin inbox choices for connection interruptions, target notices, trade errors, daily loss limits, stop-loss execution, closed losses, payment reminders, period statements and low battery. Don’t receive email notifications stops automatic Admin inbox delivery and cancels matching pending notices while retaining category choices. Follower delivery, manually sent mail, Activity records and safeguards remain separate. Save on this tab requires no password.
+Settings → Email Notifications has separate Admin inbox choices for connection interruptions, target notices, trade errors, daily loss limits, stop-loss execution, closed losses, payment reminders, period statements and low battery. Don’t receive email notifications stops automatic emails for all accounts and cancels pending automatic notices while retaining category choices. Manually sent mail, Activity records and safeguards remain available. Save on this tab requires no password.
 MT5 setup may open a detected-symbol H1 startup chart to load the companion; this is separate from manual follower chart choice. No order is placed by that startup chart.
 
 Sizing status messages occupy the full value column; lots appears only beside a numeric size. Required margin starts red as Not calculated and remains red when verification fails. Verified affordable margin is green. Desktop checkbox states use matching red OFF and green ON backgrounds.
@@ -370,4 +392,60 @@ Both terminal platforms use the same margin colours and sizing checks. A reached
 Required Margin always describes the displayed lot size. A red requested size remains blocked from execution; a valid affordable size is shown in green. The margin estimate updates with the planned stop-loss distance and broker free margin. Unavailable broker checks remain clearly identified rather than displaying an invented amount.
 Calculated Size shows the risk-based lot size numerically in red when current free margin cannot fund it. Required Margin retains that exact label and shows the broker-calculated amount for the displayed size, in red when insufficient and green when verified affordable. Moving the planned stop recalculates size and margin. Hover explains current free margin and rejection. A red displayed size is an estimate, not permission to send; final execution repeats all eligibility checks.
 
-Calculated lots display two decimal places on both platforms; broker lot-step precision is retained for order validation. Settings displays the all-account email stop separately from Admin inbox choices, including previously saved notification settings.
+Calculated lots display two decimal places on both platforms; broker lot-step precision is retained for order validation. Settings has one Don’t receive email notifications option for all accounts. It reflects either previously saved email stop; no preferences change until Save.
+
+
+
+Account totals and connection audits
+The Accounts header shows Active, Frozen and Due as fractions of registered accounts, followed by Total accounts. Analytics shows one combined summary of all follower accounts, without individual account sheets or an Account report action. Connection audit filters detected offline periods by local desktop date, with a unique ERR ID, first detected time, reconnection time and reported reason. Use Pending diagnosis while the cause is not established; never substitute an invented explanation. Audits are read-only and can be viewed, downloaded or emailed as PDFs. New reports and payment logs include recorded target resets and connection audits. Times represent desktop observations; app-closed gaps cannot be reconstructed.
+
+Before your first demo test
+Use one demo lead account and one demo follower for your first test. Each account needs its own MetaTrader installation. MT4 and MT5 hedging accounts are supported; MT5 netting accounts are not. Keep copying paused while you set up accounts. Only verified MT4 and MT5 connectors are available; future connectors need their own guided activation process.
+
+
+
+EXECUTED TRADES
+Double-click an account row to open Executed trades; use Edit account to change registration details. Executed trades is also available inside Analytics. Choose From/To broker dates, then search by account name/number, broker, symbol or ticket and select All, Manual execution, System execution or Classification pending. Press Search executions to apply the filters. Double-click a result for its recorded details.
+View, Download and Email produce the same filtered PDF with its reporting range. The screen shows at most 2,000 records to remain manageable; narrow the filters or export the complete matching report. Both scrollbars are available. Retained history is readable when the terminal is offline, but it is not a current broker query. Partial exits are separate records, and separate entry charges stay on entry records. Missing history is not invented.
+
+DAILY LOSS LIMITS
+Daily Limits is an account-wide TradePilot entry check. Choose Cash or Percentage, enter a positive loss limit and press Update. Percentage uses the account's starting balance for its broker daily period. Blank means no daily entry limit. Removing a saved limit requires a warning confirmation; changing a limit creates a dated Account changes record in Analytics.
+Budget left uses selected completed results and open risk from entries in the current broker period beginning at 23:30. Carry-over entries are excluded. Available broker commission, swap and fee records are included. Deposits and withdrawals are not trading profit. Daily Performance and Daily Loss Limit have independent Apply wins/losses selections for completed Current Basket results. Open risk from current-period entries remains part of the loss guard; carry-over entries stay separate.
+After the loss threshold is reached, new TradePilot entries stay paused for that broker period even if prices recover. Update the limit deliberately or wait for the next period. Hover over Buy or Sell for the reason. Missing or unverified daily-budget replies block new entries without labelling an otherwise verified broker connection offline.
+This check does not close existing positions, cancel broker pending orders or control orders entered outside TradePilot. Pending orders already accepted by the broker can still execute. Stop-loss estimates cannot guarantee the final loss during price gaps, slippage or additional broker charges. Each lead and follower uses its own broker results and remaining budget.
+Daily-limit and daily-target messages need enabled email delivery and the relevant account notification preference. Account changes retains dated limit edits with individual references. The desktop and both companions must be the matching version; older companions require a setup refresh.
+
+SPREAD AND ACCURATE TRADE REPORTS
+The position sizer Spread ON/OFF control starts OFF. ON moves the planned stop one current spread farther from entry and recalculates size; OFF restores the unadjusted level. Dragging/typing a new stop establishes a new base and applies the spread once. Refreshing never repeatedly adds spread. Existing trade stops are not modified by this planning control. Hover over the control for its purpose.
+Activity trade rows include unique TradePilot references; historical CMD references remain readable. Click an attempt to view its exact recorded account, date, symbol, status and response, then View, Download or Email its PDF. A symbol error applies only to that attempt; no fresh quote and broker/local trading restrictions are reported separately. Selection failures without an broker symbol-not-found code are not labelled symbol unavailable.
+
+COUNTRY, PHONE AND CHANGING THE LEAD
+Country and phone are mandatory when adding or editing accounts. Select an account owner country from the full country list, then choose the phone country/dialling code and enter the national number. The phone country can differ from the owner country.
+To change a follower to lead, Edit account and select Lead account in Account type. Review existing positions first, keep trading off, and close the current lead and the selected follower terminals. Confirm the change. The former lead becomes a follower; both affected setups need refresh through Terminal Setup. Existing trades are not closed or transferred. Pending app commands are cancelled, prior trades are not replayed, payments/history remain recorded, and both role changes appear in account/report audits.
+
+BROKER AUTOMATED TRADING RESTRICTIONS
+MT5 error 10026 means the broker server refused automated trading; the toolbar/F7 switches cannot override it. Ask the broker whether this account permits Expert Advisors. Error 10027 is the terminal switch restriction. Terminal Setup reads fresh terminal, advisor and account permission checks separately. A successful connection or enabled local switch does not guarantee the broker will execute an order. Failed entries are not replayed.
+
+ADMIN COMPANY INFORMATION
+Company information appears only in Add account for the lead account, before the personal names. Company or account holder name is required. Admin name, company registration, VAT, tax number, address and logo are optional. Edit account contains account details only. Upload a PNG or JPEG company logo. Blank business fields are omitted. Company logos appear at the top centre and TradePilot at the bottom centre of documents.
+
+MANUAL FOLLOWER CHARTS
+Open the follower charts you want manually. TradePilot does not open follower charts to match the lead. It attaches its tools to eligible existing/opened charts while the desktop and terminal are running. Other advisors are preserved; Activity explains conflicts. Matching TradePilot companions that stop reporting can be restarted with their saved inputs and permission flags unchanged.
+
+SEARCH, LEAD HISTORY AND CONNECTION RELIABILITY
+Type in any dropdown to narrow the matching choices, then open the arrow list and select a result. Fixed choice fields retain valid selections; typing does not create a new platform or country. Accounts search finds words in names, account numbers, broker, platform, country, email and Paid/Frozen/Due status. Admin guide Search guide words highlights matching text. Activity and Email outbox each have their own word search.
+The current lead is always the first account row. Lead count is the number of recorded lead appointments, including the initial lead and later promotions. Retained role audits rebuild previous evidenced appointments; unrecorded history is not invented.
+If a follower is offline for more than one minute, TradePilot queues one connection-check email per outage to its saved email and the Admin email. Delivery requires the desktop running, enabled email and a working provider. Reconnection closes the outage. Analytics includes the count of outages over one minute, offline/online times, reference and reason, plus whether live positions were observed around/during the outage. These are desktop-observed times, not proof of executions while disconnected; app-closed gaps and missing history cannot be reconstructed. Connection audit PDFs retain details for each account.
+
+
+
+CHART TOOLS LAYOUT
+Point Measurer sits directly beside the main left-hand grid. Pending Order sits underneath Point Measurer in that same second column. The panels resize together to fit the chart; hiding Point Measurer moves Pending Order up without overlapping the grid. Pending Order still starts OFF and must be enabled manually.
+
+ANALYTICS PERIOD AND CLOSING THE APP
+Analytics first asks for Current period (broker month to current broker date) or Date range. Enter YYYY-MM-DD dates and press Next. The screen and every exported summary PDF display the inclusive range. Exit records are filtered by broker exit date; balance, equity, open orders and account counts remain current snapshots, not historical assets. Broker retention may leave incomplete history. Back returns to the period selector.
+All visible account roles use Lead account and Follower account. Generated PDFs retain TradePilot branding without the personal author line.
+Closing TradePilot always asks for confirmation and explains copying, emails and local terminal schedules. On an ordinary Windows shutdown/restart/sign-out, Windows can show TradePilot's warning with the choice to cancel or force shutdown. Forced shutdown, a killed process, battery failure or power loss may bypass this warning. The app cannot guarantee a warning or continued trade management when Windows or power stops. Existing broker positions and orders are not automatically closed.
+
+SEND MAIL SIGNATURE
+Use Send Mail after Terminal Setup. Select one or several followers, edit recipient addresses, subject and message, or use Broadcast to all accounts. Edit the separate Signature field and click Save signature to reuse it later. Sending also saves the signature. Cancel closes the message without sending. Each recipient receives a separate message. Email setup and reminders contains sender credentials and reminder settings.
